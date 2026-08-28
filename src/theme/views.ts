@@ -81,7 +81,7 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
 
   <!-- 页脚 -->
   <footer>
-    <p>© ${new Date().getFullYear()} <a href="/">${escapeHtml(props.settings.site_title)}</a> · Powered by Cloudflare Workers + D1 · <a href="/admin/">后台管理</a> · <a href="/rss.xml">RSS</a></p>
+    <p>© ${new Date().getFullYear()} <a href="/">${escapeHtml(props.settings.site_title)}</a> · Powered by Cloudflare Workers + D1 · <a href="/rss.xml">RSS</a></p>
   </footer>
 
   <!-- FTS5 实时搜索弹窗 -->

@@ -219,8 +219,8 @@ export function renderAdminHtml(): string {
   <div id="login-view">
     <div class="login-card">
       <div class="login-title">🌿 林间手记 · 后台登录</div>
-      <input type="text" id="login-user" class="input-control" placeholder="管理员账号 (默认 admin)">
-      <input type="password" id="login-pass" class="input-control" placeholder="管理员密码 (默认 admin123)">
+      <input type="text" id="login-user" class="input-control" placeholder="管理员账号">
+      <input type="password" id="login-pass" class="input-control" placeholder="管理员密码">
       <button class="btn" style="width:100%;" onclick="doLogin()">立即登录</button>
       <div id="login-msg" style="color:var(--danger);font-size:0.85rem;margin-top:0.8rem;text-align:center;"></div>
     </div>
