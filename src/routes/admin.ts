@@ -361,6 +361,8 @@ export function renderAdminHtml(): string {
         <input type="text" id="set-site-desc" class="input-control">
         <label style="font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:0.3rem;">站长作者名</label>
         <input type="text" id="set-site-author" class="input-control">
+        <label style="font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:0.3rem;">站长头像 URL (可填网络图片链接或留空使用默认)</label>
+        <input type="text" id="set-site-avatar" class="input-control" placeholder="https://...">
 
         <button class="btn" style="margin-top:1.5rem;" onclick="saveSettings()">💾 保存全站配置</button>
       </section>
@@ -544,6 +546,7 @@ export function renderAdminHtml(): string {
       document.getElementById('set-site-subtitle').value = s.site_subtitle || '';
       document.getElementById('set-site-desc').value = s.site_description || '';
       document.getElementById('set-site-author').value = s.site_author || '';
+      document.getElementById('set-site-avatar').value = s.site_avatar || '';
     }
 
     async function saveSettings() {
@@ -552,6 +555,7 @@ export function renderAdminHtml(): string {
         site_subtitle: document.getElementById('set-site-subtitle').value.trim(),
         site_description: document.getElementById('set-site-desc').value.trim(),
         site_author: document.getElementById('set-site-author').value.trim(),
+        site_avatar: document.getElementById('set-site-avatar').value.trim(),
       };
 
       const res = await fetch('/api/admin/settings', {

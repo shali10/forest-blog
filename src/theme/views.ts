@@ -394,7 +394,7 @@ export function renderSidebar(props: {
   return `
     <aside class="sidebar">
       <div class="profile-card">
-        <img class="avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=forest&backgroundColor=e6f9f6" alt="${escapeHtml(props.settings.site_author)}">
+        <img class="avatar" src="${escapeHtml(props.settings.site_avatar || 'https://api.dicebear.com/7.x/bottts/svg?seed=forest&backgroundColor=e6f9f6')}" alt="${escapeHtml(props.settings.site_author)}">
         <div class="name">${escapeHtml(props.settings.site_author)}</div>
         <div class="bio">${escapeHtml(props.settings.site_subtitle)}</div>
         
