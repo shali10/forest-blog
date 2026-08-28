@@ -1,6 +1,6 @@
 // ==========================================================
 // 经典温暖手帐风 (Warm Pastel Cream & 3D Cards Theme)
-// 100% 还原并增强之前版本的治愈系排版、左右侧边栏与卡片设计
+// 100% 还原并增强移动端抽屉侧边栏与桌面端三栏布局
 // ==========================================================
 
 export const forestThemeCss = `
@@ -47,6 +47,43 @@ body {
 button, input, select, textarea { font-family: inherit; }
 a { color: var(--btn-bg); text-decoration: none; transition: all 0.2s; }
 a:hover { filter: brightness(0.9); }
+
+/* 移动端汉堡包抽屉按钮 */
+.mobile-nav-toggle {
+  display: none;
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  z-index: 1004;
+  width: 42px;
+  height: 42px;
+  background: var(--btn-bg);
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+  box-shadow: 0 3px 0 var(--btn-shadow);
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  align-items: center;
+  justify-content: center;
+}
+.mobile-nav-toggle.nav-open {
+  left: 285px !important;
+}
+
+/* 移动端遮罩层 */
+.mobile-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(3px);
+  z-index: 999;
+}
+.mobile-overlay.show {
+  display: block;
+}
 
 /* 顶栏 Header Banner */
 header {
@@ -122,68 +159,65 @@ main {
 }
 
 /* 左侧栏 & 右侧栏 */
-.sidebar { width: 280px; flex-shrink: 0; display: flex; flex-direction: column; gap: 20px; }
-.sidebar-right { width: 280px; flex-shrink: 0; display: flex; flex-direction: column; gap: 20px; }
+.sidebar { width: 280px; flex-shrink: 0; display: flex; flex-direction: column; gap: 16px; }
+.sidebar-right { width: 280px; flex-shrink: 0; display: flex; flex-direction: column; gap: 16px; }
 .post-list-col { width: 740px; flex-shrink: 0; display: flex; flex-direction: column; gap: 24px; }
 
 /* 治愈系个人资料卡片 (Profile Card) */
 .profile-card {
   background: var(--card-bg);
   border-radius: 20px;
-  padding: 24px;
+  padding: 22px;
   box-shadow: 0 4px 12px rgba(107, 92, 67, 0.12);
   border: 2px solid var(--card-border);
 }
-.profile-card .avatar-box {
-  width: 110px;
-  height: 110px;
+.profile-card .avatar {
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
-  margin: 0 auto 14px;
+  object-fit: cover;
+  margin: 0 auto 12px;
+  display: block;
   border: 3px solid var(--card-border);
-  background: var(--body-bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 3.5rem;
+  background: #FFF;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 .profile-card .name {
-  font-size: 1.25em;
+  font-size: 1.15em;
   font-weight: 800;
   text-align: center;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   color: var(--text-primary);
 }
 .profile-card .bio {
   color: var(--text-body);
-  font-size: 0.88em;
+  font-size: 0.85em;
   text-align: center;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   line-height: 1.5;
 }
 .profile-card .stats {
   display: flex;
   justify-content: center;
   gap: 20px;
-  padding-bottom: 16px;
-  border-bottom: 2px dashed var(--card-border);
+  padding-bottom: 14px;
 }
 .profile-card .stat-item { text-align: center; }
 .profile-card .stat-num {
-  font-size: 1.25em;
+  font-size: 1.2em;
   font-weight: 800;
   color: var(--btn-bg);
   display: block;
 }
 .profile-card .stat-label {
-  font-size: 0.78em;
+  font-size: 0.75em;
   color: var(--text-secondary);
   font-weight: 600;
 }
-.card-section-title {
-  font-size: 0.88em;
+.profile-card h4 {
+  font-size: 0.85em;
   color: var(--text-secondary);
-  margin: 16px 0 10px;
+  margin: 14px 0 8px;
   font-weight: 800;
   letter-spacing: 0.5px;
   display: flex;
@@ -196,12 +230,12 @@ main {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 9px 14px;
-  margin-bottom: 8px;
+  padding: 8px 12px;
+  margin-bottom: 6px;
   color: var(--text-body);
   background: var(--body-bg);
   border-radius: 12px;
-  font-size: 0.88em;
+  font-size: 0.85em;
   font-weight: 700;
   border: 2px solid transparent;
   transition: all 0.2s ease;
@@ -221,6 +255,7 @@ main {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  padding: 4px 0;
 }
 .tag-badge {
   display: inline-block;
@@ -589,10 +624,35 @@ footer a { color: var(--text-primary); font-weight: 700; }
   .sidebar-right { display: none; }
   .post-list-col { width: 100%; flex: 1; }
 }
+
 @media (max-width: 768px) {
+  header { padding: 25px 16px 20px; }
   header h1 { font-size: 1.8em; }
-  main { flex-direction: column; padding: 0 12px; margin-top: 16px; }
-  .sidebar { width: 100%; }
+  header p { font-size: 0.9em; }
+  .mobile-nav-toggle {
+    display: flex;
+  }
+  main {
+    flex-direction: column;
+    padding: 0 14px;
+    margin-top: 14px;
+  }
+  .sidebar {
+    width: 275px;
+    position: fixed;
+    top: 0;
+    left: -285px;
+    height: 100vh;
+    z-index: 1002;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    background: var(--body-bg);
+    padding: 16px;
+    box-shadow: 2px 0 16px rgba(0,0,0,0.15);
+  }
+  .sidebar.open {
+    left: 0;
+  }
   .post-card { flex-direction: column; }
   .post-card .post-cover { width: 100%; height: 120px; border-right: none; border-bottom: 2px solid var(--card-border); }
   .article-container { padding: 22px 18px; }

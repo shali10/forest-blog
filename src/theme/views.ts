@@ -54,6 +54,12 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
 </head>
 <body>
 
+  <!-- 移动端抽屉开关按钮 -->
+  <button class="mobile-nav-toggle" onclick="toggleNav()" title="菜单">☰</button>
+
+  <!-- 移动端抽屉遮罩 -->
+  <div class="mobile-overlay" id="mobileOverlay" onclick="toggleNav()"></div>
+
   <!-- 顶部 Header Banner -->
   <header>
     <div class="header-actions">
@@ -95,6 +101,16 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
   </div>
 
   <script>
+    // 移动端抽屉切换
+    function toggleNav() {
+      const sidebar = document.querySelector('.sidebar');
+      const overlay = document.getElementById('mobileOverlay');
+      const toggle = document.querySelector('.mobile-nav-toggle');
+      if (sidebar) sidebar.classList.toggle('open');
+      if (overlay) overlay.classList.toggle('show');
+      if (toggle) toggle.classList.toggle('nav-open');
+    }
+
     function toggleTheme() {
       const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
       if (isDark) {
@@ -164,7 +180,7 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
 </html>`;
 }
 
-// 统一左侧边栏生成器 (Profile + Categories + Links + Tags)
+// 统一左侧边栏 (完美复刻移动端抽屉与桌面端 Profile Card)
 export function renderSidebar(props: {
   settings: SiteSettings;
   categories: Category[];
@@ -176,41 +192,43 @@ export function renderSidebar(props: {
   return `
     <aside class="sidebar">
       <div class="profile-card">
-        <div class="avatar-box">🌿</div>
+        <img class="avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=forest&backgroundColor=e6f9f6" alt="${escapeHtml(props.settings.site_author)}">
         <div class="name">${escapeHtml(props.settings.site_author)}</div>
         <div class="bio">${escapeHtml(props.settings.site_subtitle)}</div>
         
         <div class="stats">
           <div class="stat-item">
-            <span class="stat-num">${props.stats.post_count}</span>
-            <span class="stat-label">文章</span>
+            <div class="stat-num">${props.stats.post_count}</div>
+            <div class="stat-label">文章</div>
           </div>
           <div class="stat-item">
-            <span class="stat-num">${props.stats.category_count}</span>
-            <span class="stat-label">分类</span>
+            <div class="stat-num">${props.stats.category_count}</div>
+            <div class="stat-label">分类</div>
           </div>
           <div class="stat-item">
-            <span class="stat-num">${props.stats.tag_count}</span>
-            <span class="stat-label">标签</span>
+            <div class="stat-num">${props.stats.tag_count}</div>
+            <div class="stat-label">标签</div>
           </div>
         </div>
 
-        <div class="card-section-title">📁 文章分类</div>
+        <div style="border-bottom:2px solid var(--card-border);margin-bottom:14px"></div>
+
+        <h4>📁 分类</h4>
         <div class="category-list">
-          <a href="/" style="${!props.currentCategory ? 'border-color:var(--btn-bg);background:#E6F9F6;' : ''}">
-            <span>全部文章</span>
-            <span style="opacity:0.7;">${props.stats.post_count}</span>
+          <a href="/" style="${!props.currentCategory ? 'border-color:var(--btn-bg);background:#E6F9F6;color:var(--btn-shadow);' : ''}">
+            <span>全部</span>
+            <span style="opacity:0.75;">${props.stats.post_count}</span>
           </a>
           ${props.categories.map(c => `
-            <a href="/?category=${encodeURIComponent(c.slug)}" style="${props.currentCategory === c.slug ? 'border-color:var(--btn-bg);background:#E6F9F6;' : ''}">
+            <a href="/?category=${encodeURIComponent(c.slug)}" style="${props.currentCategory === c.slug ? 'border-color:var(--btn-bg);background:#E6F9F6;color:var(--btn-shadow);' : ''}">
               <span>${escapeHtml(c.name)}</span>
-              <span style="opacity:0.7;">${c.post_count || 0}</span>
+              <span style="opacity:0.75;">${c.post_count || 0}</span>
             </a>
           `).join('')}
         </div>
 
         ${props.links.length > 0 ? `
-          <div class="card-section-title">🤝 邻里友链</div>
+          <h4>🤝 友链</h4>
           <div class="link-list">
             ${props.links.map(l => `
               <a href="${escapeHtml(l.url)}" target="_blank" rel="noopener">
@@ -222,14 +240,13 @@ export function renderSidebar(props: {
         ` : ''}
       </div>
 
-      <div class="profile-card">
-        <div class="card-section-title" style="margin-top:0;">🏷️ 热门标签</div>
+      <div class="profile-card" style="margin-top:16px;">
         <div class="tag-cloud">
           ${props.tags.map((t, i) => {
             const color = TAG_COLORS[i % TAG_COLORS.length];
             return `
               <a href="/?tag=${encodeURIComponent(t.name)}" class="tag-badge" style="background:${color};">
-                #${escapeHtml(t.name)} (${t.post_count || 1})
+                ${escapeHtml(t.name)}
               </a>
             `;
           }).join('')}
@@ -312,7 +329,7 @@ export function renderHomeView(props: {
   const rightSidebar = `
     <aside class="sidebar-right">
       <div class="profile-card">
-        <div class="card-section-title" style="margin-top:0;">📌 快速导航</div>
+        <h4 style="margin-top:0;">📌 快速导航</h4>
         <div class="category-list">
           <a href="/archives"><span>📜 全站文章归档</span><span>→</span></a>
           <a href="/links"><span>🤝 邻里友链</span><span>→</span></a>
@@ -329,7 +346,7 @@ export function renderHomeView(props: {
   });
 }
 
-// 文章详情页渲染（左侧统一保留 Profile 侧边栏，正文在右侧优雅展开）
+// 文章详情页渲染
 export function renderPostView(props: {
   settings: SiteSettings;
   post: Post;
@@ -388,7 +405,7 @@ export function renderPostView(props: {
           <div class="tag-cloud">
             ${props.post.tags.split(',').filter(Boolean).map((t, i) => `
               <span class="tag-badge" style="background:${TAG_COLORS[i % TAG_COLORS.length]};">
-                #${escapeHtml(t.trim())}
+                ${escapeHtml(t.trim())}
               </span>
             `).join(' ')}
           </div>
@@ -406,7 +423,7 @@ export function renderPostView(props: {
   });
 }
 
-// 归档页（同样带左侧边栏）
+// 归档页
 export function renderArchivesView(props: {
   settings: SiteSettings;
   posts: Post[];
@@ -465,7 +482,7 @@ export function renderArchivesView(props: {
   });
 }
 
-// 友链页（带左侧边栏）
+// 友链页
 export function renderLinksView(props: {
   settings: SiteSettings;
   links: Link[];
