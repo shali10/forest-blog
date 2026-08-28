@@ -24,6 +24,8 @@ export const forestThemeCss = `
   --btn-shadow: #9E461E;
   --cover-bg: linear-gradient(135deg, #FBF4EA, #EFE2D0);
   --code-bg: #2B221E;
+  --dot-color: rgba(124, 77, 56, 0.08);
+  --tape-color: rgba(224, 160, 118, 0.55);
 }
 
 /* 2. 复古报刊 (Parchment Retro - 经典复古羊皮纸与墨绿印版) */
@@ -39,6 +41,8 @@ export const forestThemeCss = `
   --btn-shadow: #6E391A;
   --cover-bg: linear-gradient(135deg, #EBE1CE, #DFD1B8);
   --code-bg: #22201D;
+  --dot-color: rgba(50, 67, 54, 0.08);
+  --tape-color: rgba(198, 172, 134, 0.55);
 }
 
 /* 3. 暖木中古 (Caramel Antique - 焦糖暖栗秋日手账) */
@@ -54,6 +58,8 @@ export const forestThemeCss = `
   --btn-shadow: #AD5B1F;
   --cover-bg: linear-gradient(135deg, #F8EFE0, #EADBC5);
   --code-bg: #261F1A;
+  --dot-color: rgba(140, 88, 40, 0.08);
+  --tape-color: rgba(228, 178, 126, 0.55);
 }
 
 /* 4. 森系温润 (Forest Warm - 自然青翠纸感) */
@@ -69,6 +75,8 @@ export const forestThemeCss = `
   --btn-shadow: #336341;
   --cover-bg: linear-gradient(135deg, #EBF2EA, #DAE6D8);
   --code-bg: #222923;
+  --dot-color: rgba(65, 107, 74, 0.08);
+  --tape-color: rgba(148, 196, 158, 0.55);
 }
 
 /* 5. 落樱和风 (Sakura Sweet) */
@@ -84,6 +92,8 @@ export const forestThemeCss = `
   --btn-shadow: #B84A5E;
   --cover-bg: linear-gradient(135deg, #FFE5EC, #FFD1DC);
   --code-bg: #2E2528;
+  --dot-color: rgba(232, 142, 155, 0.1);
+  --tape-color: rgba(248, 186, 196, 0.6);
 }
 
 /* 6. 宇治抹茶 (Matcha Zen) */
@@ -99,6 +109,8 @@ export const forestThemeCss = `
   --btn-shadow: #436125;
   --cover-bg: linear-gradient(135deg, #E0EBD4, #CDE0BC);
   --code-bg: #232B20;
+  --dot-color: rgba(82, 115, 51, 0.09);
+  --tape-color: rgba(168, 196, 142, 0.55);
 }
 
 /* 7. 星野深蓝 (Starry Ocean) */
@@ -114,6 +126,8 @@ export const forestThemeCss = `
   --btn-shadow: #285582;
   --cover-bg: linear-gradient(135deg, #DCE7F3, #C7D9EC);
   --code-bg: #1E2734;
+  --dot-color: rgba(46, 75, 114, 0.09);
+  --tape-color: rgba(150, 185, 222, 0.55);
 }
 
 /* 8. Geist 极简极客 (Geist Monochrome) */
@@ -129,6 +143,8 @@ export const forestThemeCss = `
   --btn-shadow: #024EA4;
   --cover-bg: linear-gradient(135deg, #EAEFF5, #DCE3EB);
   --code-bg: #1B1F23;
+  --dot-color: rgba(0, 0, 0, 0.06);
+  --tape-color: rgba(200, 205, 212, 0.6);
 }
 
 /* 9. 赛博深邃暗夜 (Cyber Dark) */
@@ -144,12 +160,16 @@ export const forestThemeCss = `
   --btn-shadow: #0284C7;
   --cover-bg: linear-gradient(135deg, #242938, #181C26);
   --code-bg: #0F131A;
+  --dot-color: rgba(56, 189, 248, 0.1);
+  --tape-color: rgba(56, 189, 248, 0.25);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
   font-family: var(--font-main);
-  background: var(--body-bg);
+  background-color: var(--body-bg);
+  background-image: radial-gradient(var(--dot-color, rgba(120, 80, 40, 0.08)) 1.2px, transparent 1.2px);
+  background-size: 22px 22px;
   color: var(--text-body);
   line-height: 1.75;
   min-height: 100vh;
@@ -275,6 +295,36 @@ header::after {
   background: rgba(255, 255, 255, 0.35);
   transform: translateY(-1px);
 }
+.header-season-capsule {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: #fff;
+  padding: 5px 12px;
+  border-radius: 50px;
+  font-size: 0.78em;
+  font-weight: 700;
+  backdrop-filter: blur(6px);
+  letter-spacing: 0.5px;
+}
+@media (max-width: 720px) {
+  .header-season-capsule { display: none; }
+}
+.status-live-dot {
+  width: 7px;
+  height: 7px;
+  background: #48BB78;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(72, 187, 120, 0.3);
+  animation: pulseLiveDot 2s infinite;
+}
+@keyframes pulseLiveDot {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(72, 187, 120, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(72, 187, 120, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(72, 187, 120, 0); }
+}
 .mobile-nav-btn {
   display: none;
   background: rgba(255, 255, 255, 0.25);
@@ -323,25 +373,48 @@ header::after {
 .quote-hero-box {
   max-width: 820px;
   margin: 0 auto;
-  padding: 10px 16px;
+  padding: 18px 36px;
   position: relative;
   z-index: 5;
   cursor: pointer;
   user-select: none;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1.5px solid rgba(255, 255, 255, 0.32);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
+.quote-hero-box:hover {
+  background: rgba(255, 255, 255, 0.24);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+.quote-mark {
+  position: absolute;
+  font-size: 3.8rem;
+  font-family: Georgia, serif;
+  line-height: 1;
+  opacity: 0.22;
+  color: #fff;
+  pointer-events: none;
+}
+.quote-mark-left { top: 4px; left: 14px; }
+.quote-mark-right { bottom: -12px; right: 14px; }
 .quote-text {
-  font-size: 2.1em;
+  font-size: 1.85em;
   font-weight: 800;
   line-height: 1.45;
   letter-spacing: 0.03em;
   text-shadow: 0 2px 6px rgba(0,0,0,0.15);
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   display: inline-block;
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 .quote-author {
   opacity: 0.92;
-  font-size: 1.05em;
+  font-size: 0.95em;
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -438,22 +511,52 @@ main {
 
 /* 治愈系个人资料卡片 (Profile Card) */
 .profile-card {
+  position: relative;
   background: var(--card-bg);
   border-radius: 20px;
-  padding: 22px;
-  box-shadow: 0 4px 12px rgba(107, 92, 67, 0.12);
+  padding: 24px 22px;
+  box-shadow: 0 4px 14px rgba(107, 92, 67, 0.09);
   border: 2px solid var(--card-border);
 }
+/* 和纸手账胶带 (Washi Tape) */
+.washi-tape {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-1.5deg);
+  width: 110px;
+  height: 22px;
+  background: var(--tape-color, rgba(230, 180, 130, 0.6));
+  border-left: 2px dashed rgba(255, 255, 255, 0.6);
+  border-right: 2px dashed rgba(255, 255, 255, 0.6);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.06);
+  z-index: 6;
+  pointer-events: none;
+  border-radius: 2px;
+}
 .profile-card .avatar {
-  width: 120px;
-  height: 120px;
+  width: 115px;
+  height: 115px;
   border-radius: 50%;
   object-fit: cover;
-  margin: 0 auto 12px;
+  margin: 6px auto 12px;
   display: block;
   border: 3px solid var(--card-border);
   background: #FFF;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+}
+.profile-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--body-bg);
+  border: 1.5px solid var(--card-border);
+  padding: 4px 12px;
+  border-radius: 50px;
+  font-size: 0.76em;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 12px;
 }
 .profile-card .name {
   font-size: 1.15em;
@@ -496,6 +599,64 @@ main {
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+/* 治愈系手账便签卡片 (Sticky Note) */
+.sticky-note-card {
+  position: relative;
+  background: #FFFDF0;
+  border: 2px solid #EADBB6;
+  border-radius: 16px;
+  padding: 22px 18px 16px;
+  margin-top: 18px;
+  box-shadow: 0 6px 16px rgba(130, 100, 60, 0.1);
+  transform: rotate(-1.5deg);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+[data-theme="cyber"] .sticky-note-card {
+  background: #1C2333;
+  border-color: #2E3852;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+}
+.sticky-note-card:hover {
+  transform: rotate(0deg) translateY(-2px);
+  box-shadow: 0 10px 22px rgba(130, 100, 60, 0.16);
+}
+.sticky-pin {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.35rem;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+.sticky-title {
+  font-size: 0.82em;
+  font-weight: 800;
+  color: #9C6634;
+  letter-spacing: 1px;
+  text-align: center;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+[data-theme="cyber"] .sticky-title { color: #38BDF8; }
+.sticky-text {
+  font-size: 0.88em;
+  line-height: 1.6;
+  color: #5C432D;
+  font-weight: 700;
+  text-align: center;
+  font-style: italic;
+  margin-bottom: 10px;
+}
+[data-theme="cyber"] .sticky-text { color: #E2E8F0; }
+.sticky-meta {
+  font-size: 0.72em;
+  font-weight: 700;
+  color: #A88F78;
+  text-align: right;
+  border-top: 1px dashed #E2CE9F;
+  padding-top: 6px;
 }
 
 /* 分类与链接列表 */
@@ -562,9 +723,10 @@ main {
 
 /* 文章列表项卡片 (Post Card) */
 .post-card {
+  position: relative;
   background: var(--card-bg);
   border-radius: 20px;
-  box-shadow: 0 4px 12px rgba(107, 92, 67, 0.12);
+  box-shadow: 0 4px 14px rgba(107, 92, 67, 0.08);
   border: 2px solid var(--card-border);
   display: flex;
   flex-direction: row;
@@ -573,22 +735,45 @@ main {
 }
 .post-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 10px 24px rgba(114, 93, 66, 0.18);
+  box-shadow: 0 12px 28px rgba(114, 93, 66, 0.16);
   border-color: var(--btn-bg);
 }
+.post-stamp {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  border: 1.5px dashed var(--btn-bg);
+  color: var(--btn-bg);
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.68em;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  transform: rotate(5deg);
+  opacity: 0.55;
+  pointer-events: none;
+  text-transform: uppercase;
+  transition: all 0.25s ease;
+  background: var(--body-bg);
+}
+.post-card:hover .post-stamp {
+  opacity: 0.95;
+  transform: rotate(0deg) scale(1.05);
+}
 .post-card .post-cover {
-  width: 210px;
+  width: 200px;
   flex-shrink: 0;
   background: var(--cover-bg);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 4rem;
+  font-size: 3.8rem;
   border-right: 2px solid var(--card-border);
+  position: relative;
 }
 .post-card .post-content {
   flex: 1;
-  padding: 22px;
+  padding: 22px 24px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -600,10 +785,12 @@ main {
   color: var(--text-primary);
   font-weight: 800;
   line-height: 1.4;
+  padding-right: 60px;
 }
 .post-card h2 a {
   color: var(--text-primary);
   text-decoration: none;
+  transition: color 0.2s;
 }
 .post-card h2 a:hover {
   color: var(--btn-bg);
@@ -619,7 +806,7 @@ main {
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 10px;
   font-size: 0.82em;
   font-weight: 700;
   color: var(--text-secondary);
@@ -627,7 +814,31 @@ main {
 .meta-left {
   display: flex;
   align-items: center;
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--body-bg);
+  border: 1px solid var(--card-border);
+  padding: 3px 9px;
+  border-radius: 50px;
+  font-size: 0.88em;
+  color: var(--text-body);
+}
+.category-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, var(--btn-bg), var(--btn-shadow));
+  color: #fff !important;
+  padding: 3px 10px;
+  border-radius: 50px;
+  font-size: 0.88em;
+  font-weight: 800;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 /* 3D 实体圆角按钮 */
@@ -829,23 +1040,42 @@ a.read-more-btn:active, button.share-action-btn:active {
   transform: translateX(-50%) translateY(0);
 }
 
-/* 治愈系引用卡片 */
+/* 治愈系多色引用卡片 (Callouts) */
 .forest-quote {
   background: var(--body-bg);
   border-left: 5px solid var(--btn-bg);
   border-radius: 0 16px 16px 0;
-  padding: 14px 20px;
-  margin: 1.5em 0;
+  padding: 16px 22px;
+  margin: 1.6em 0;
   font-style: normal;
   border-top: 1px solid var(--card-border);
   border-right: 1px solid var(--card-border);
   border-bottom: 1px solid var(--card-border);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
 }
 .forest-quote p {
   margin-bottom: 0.5em;
 }
 .forest-quote p:last-child {
   margin-bottom: 0;
+}
+
+/* 页脚手账缝线与装饰 */
+footer {
+  margin-top: auto;
+  padding: 30px 20px;
+  text-align: center;
+  font-size: 0.85em;
+  color: var(--text-secondary);
+  border-top: 2px dashed var(--card-border);
+  position: relative;
+}
+footer a {
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+footer a:hover {
+  color: var(--btn-bg);
 }
 
 /* 代码块 */

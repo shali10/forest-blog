@@ -92,6 +92,10 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
           <span>🍃</span>
           <span>${escapeHtml(props.settings.site_title)}</span>
         </a>
+        <div class="header-season-capsule">
+          <span class="status-live-dot"></span>
+          <span>SEASON 08 · 暮色晚灯</span>
+        </div>
       </div>
       <div class="header-topbar-right">
         <button class="search-trigger-btn" onclick="openSearch()" title="搜索 (Ctrl+K)">
@@ -105,7 +109,9 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
 
     <!-- 灵动诗意名言金句展示区 -->
     <div class="quote-hero-box" onclick="rotateQuote()" title="点击换一句名言">
+      <span class="quote-mark quote-mark-left">“</span>
       <div id="hero-quote-text" class="quote-text">万物皆有裂痕，那是光照进来的地方</div>
+      <span class="quote-mark quote-mark-right">”</span>
       <div id="hero-quote-author" class="quote-author">
         <span>— 莱昂纳德·科恩 (Leonard Cohen)</span>
         <span class="quote-refresh-hint">✦ 点击换一句</span>
@@ -402,7 +408,7 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
 </html>`;
 }
 
-// 统一左侧边栏 (Profile + Categories + Links + Tags)
+// 统一左侧边栏 (Profile + Categories + Links + Tags + Sticky Note)
 export function renderSidebar(props: {
   settings: SiteSettings;
   categories: Category[];
@@ -414,7 +420,14 @@ export function renderSidebar(props: {
   return `
     <aside class="sidebar">
       <div class="profile-card">
+        <div class="washi-tape"></div>
         <img class="avatar" src="${escapeHtml(props.settings.site_avatar || 'https://api.dicebear.com/7.x/bottts/svg?seed=forest&backgroundColor=e6f9f6')}" alt="${escapeHtml(props.settings.site_author)}">
+        <div style="text-align:center;">
+          <div class="profile-status-badge">
+            <span class="status-live-dot"></span>
+            <span>认真生活中 · 收集晚风</span>
+          </div>
+        </div>
         <div class="name">${escapeHtml(props.settings.site_author)}</div>
         <div class="bio">${escapeHtml(props.settings.site_subtitle)}</div>
         
@@ -433,12 +446,12 @@ export function renderSidebar(props: {
           </div>
         </div>
 
-        <div style="border-bottom:2px solid var(--card-border);margin-bottom:14px"></div>
+        <div style="border-bottom:2px dashed var(--card-border);margin-bottom:14px"></div>
 
         <h4>📁 分类</h4>
         <div class="category-list">
           <a href="/" style="${!props.currentCategory ? 'border-color:var(--btn-bg);background:#FFF;color:var(--btn-shadow);' : ''}">
-            <span>全部</span>
+            <span>全部手记</span>
             <span style="opacity:0.75;">${props.stats.post_count}</span>
           </a>
           ${props.categories.map(c => `
@@ -450,7 +463,7 @@ export function renderSidebar(props: {
         </div>
 
         ${props.links.length > 0 ? `
-          <h4>🤝 友链</h4>
+          <h4>🤝 邻里友链</h4>
           <div class="link-list">
             ${props.links.map(l => `
               <a href="${escapeHtml(l.url)}" target="_blank" rel="noopener">
@@ -462,7 +475,16 @@ export function renderSidebar(props: {
         ` : ''}
       </div>
 
+      <!-- 治愈系今日便签 -->
+      <div class="sticky-note-card">
+        <div class="sticky-pin">📌</div>
+        <div class="sticky-title">今日小纸条</div>
+        <div class="sticky-text">“晚风很好，适合绕远路回家。把喜欢的事，慢慢收进手账里。”</div>
+        <div class="sticky-meta">SEASON 08 · 暮色晚灯</div>
+      </div>
+
       <div class="profile-card" style="margin-top:16px;">
+        <h4 style="margin-top:0;margin-bottom:10px;">🏷️ 标签云</h4>
         <div class="tag-cloud">
           ${props.tags.map((t, i) => {
             const color = TAG_COLORS[i % TAG_COLORS.length];
@@ -503,12 +525,13 @@ export function renderHomeView(props: {
   // 中间文章列表
   const postCards = props.posts.length > 0 ? props.posts.map((p, idx) => {
     const dateStr = p.created_at.slice(0, 10);
-    const emojis = ['📖', '💡', '🌲', '⚡', '🍂', '☕', '🎨'];
+    const emojis = ['📖', '💡', '🌲', '⚡', '🍂', '☕', '🎨', '🏮', '📜'];
     const emoji = emojis[idx % emojis.length];
     const isPinned = p.pinned === 1;
 
     return `
       <article class="post-card">
+        <span class="post-stamp">${isPinned ? 'FEATURED' : 'NOTE'}</span>
         <div class="post-cover">${emoji}</div>
         <div class="post-content">
           <div>
@@ -520,13 +543,11 @@ export function renderHomeView(props: {
           </div>
           <div class="meta-bar">
             <div class="meta-left">
-              <span>🏷️ ${escapeHtml(p.category_name)}</span>
-              <span>·</span>
-              <span>📅 ${dateStr}</span>
-              <span>·</span>
-              <span>👁️ ${p.views} 次浏览</span>
+              <span class="category-pill">🏷️ ${escapeHtml(p.category_name)}</span>
+              <span class="meta-pill">📅 ${dateStr}</span>
+              <span class="meta-pill">👁️ ${p.views} 阅</span>
             </div>
-            <a href="/p/${p.slug}" class="read-more-btn">阅读全文 →</a>
+            <a href="/p/${p.slug}" class="read-more-btn">打开手记 →</a>
           </div>
         </div>
       </article>
@@ -612,14 +633,15 @@ export function renderPostView(props: {
 
   const mainArticleCol = `
     <div style="flex:1;min-width:0;">
-      <div class="article-container">
+      <div class="article-container" style="position:relative;">
+        <div class="washi-tape"></div>
         <header class="article-header">
           <h1 class="article-title">${escapeHtml(props.post.title)}</h1>
           <div class="article-meta">
-            <span>🏷️ ${escapeHtml(props.post.category_name)}</span>
-            <span>📅 ${dateStr}</span>
-            <span>👁️ ${props.post.views} 次浏览</span>
-            <span>⏱️ ${props.readTimeMin} 分钟 (${props.wordCount} 字)</span>
+            <span class="category-pill">🏷️ ${escapeHtml(props.post.category_name)}</span>
+            <span class="meta-pill">📅 ${dateStr}</span>
+            <span class="meta-pill">👁️ ${props.post.views} 次浏览</span>
+            <span class="meta-pill">⏱️ ${props.readTimeMin} 分钟 (${props.wordCount} 字)</span>
             <button class="share-action-btn" onclick="copyPageLink()" title="复制链接">🔗 分享文章</button>
           </div>
         </header>
