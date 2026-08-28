@@ -27,21 +27,22 @@ export function renderMarkdown(markdownText: string): MarkdownRenderResult {
   // 2. 清理常见扩展锚点语法中的污染，如 "## 标题 {#features}"
   cleanMd = cleanMd.replace(/\s*\{#[a-zA-Z0-9_-]+\}/g, '');
 
-  // 2. 统计字数与估算阅读时间
+  // 3. 统计字数与估算阅读时间
   const cleanText = cleanMd.replace(/[#*`~>_[\]()\-+]/g, ' ').replace(/\s+/g, ' ');
   const chineseChars = (cleanText.match(/[\u4e00-\u9fa5]/g) || []).length;
   const englishWords = (cleanText.match(/[a-zA-Z0-9_-]+/g) || []).length;
   const wordCount = chineseChars + englishWords;
   const readTimeMin = Math.max(1, Math.ceil(chineseChars / 350 + englishWords / 160));
 
-  // 3. 提取 TOC
+  // 4. 提取 TOC
   const toc: TocItem[] = [];
   let headingIdCounter = 1;
 
   const renderer = new marked.Renderer();
 
   // 自定义标题渲染（生成锚点与 TOC）
-  renderer.heading = ({ text, depth }) => {
+  renderer.heading = function ({ tokens, depth }) {
+    const text = this.parser.parseInline(tokens);
     const rawText = text.replace(/<[^>]+>/g, '').trim();
     const anchorId = `heading-${headingIdCounter++}-${rawText.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '-')}`;
     
@@ -54,13 +55,13 @@ export function renderMarkdown(markdownText: string): MarkdownRenderResult {
     }
 
     return `<h${depth} id="${anchorId}" class="article-heading">
-      <a href="#${anchorId}" class="heading-anchor" aria-hidden="true">#</a>
+      <a href="#${anchorId}" class="heading-anchor" aria-hidden="true" tabindex="-1">#</a>
       <span>${text}</span>
     </h${depth}>`;
   };
 
   // 自定义代码块渲染（支持语言徽章与复制属性）
-  renderer.code = ({ text, lang }) => {
+  renderer.code = function ({ text, lang }) {
     const language = lang || 'text';
     const escapedCode = escapeHtml(text);
     return `<div class="code-block" data-lang="${language}">
@@ -72,25 +73,39 @@ export function renderMarkdown(markdownText: string): MarkdownRenderResult {
     </div>`;
   };
 
-  // 自定义表格渲染（自动包裹横向自适应容器，移动端友好）
-  renderer.table = (headerAndBody) => {
-    const header = headerAndBody.header;
-    const body = headerAndBody.rows.map(row => `<tr>${row.map(cell => `<td>${cell.text}</td>`).join('')}</tr>`).join('');
+  // 自定义表格渲染（完美解析表头与单元格内联元素，自动包裹响应式滚动容器）
+  renderer.table = function (token) {
+    const headerHtml = '<tr>' + token.header.map(cell => {
+      const alignAttr = cell.align ? ` align="${cell.align}"` : '';
+      const cellContent = this.parser.parseInline(cell.tokens);
+      return `<th${alignAttr}>${cellContent}</th>`;
+    }).join('') + '</tr>';
+
+    const bodyHtml = token.rows.map(row => {
+      return '<tr>' + row.map(cell => {
+        const alignAttr = cell.align ? ` align="${cell.align}"` : '';
+        const cellContent = this.parser.parseInline(cell.tokens);
+        return `<td${alignAttr}>${cellContent}</td>`;
+      }).join('') + '</tr>';
+    }).join('');
+
     return `<div class="table-container">
       <table class="forest-table">
-        <thead>${header}</thead>
-        <tbody>${body}</tbody>
+        <thead>${headerHtml}</thead>
+        <tbody>${bodyHtml}</tbody>
       </table>
     </div>`;
   };
 
   // 自定义引用块
-  renderer.blockquote = ({ text }) => {
-    return `<blockquote class="forest-quote">${text}</blockquote>`;
+  renderer.blockquote = function ({ tokens }) {
+    const body = this.parser.parse(tokens);
+    return `<blockquote class="forest-quote">${body}</blockquote>`;
   };
 
   // 自定义链接（安全外链属性）
-  renderer.link = ({ href, title, text }) => {
+  renderer.link = function ({ href, title, tokens }) {
+    const text = this.parser.parseInline(tokens);
     const isExternal = href.startsWith('http://') || href.startsWith('https://');
     const targetAttr = isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
     const titleAttr = title ? ` title="${escapeHtml(title)}"` : '';

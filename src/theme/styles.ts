@@ -552,12 +552,33 @@ a.read-more-btn:active {
   font-size: 1.05em;
   line-height: 1.9;
   color: var(--text-body);
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 .article-body h1, .article-body h2, .article-body h3, .article-body h4 {
   color: var(--text-primary);
   font-weight: 800;
   margin-top: 1.8em;
   margin-bottom: 0.6em;
+  position: relative;
+}
+.article-heading .heading-anchor {
+  position: absolute;
+  left: -1em;
+  color: var(--btn-bg);
+  opacity: 0;
+  text-decoration: none;
+  font-weight: 600;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.article-heading:hover .heading-anchor {
+  opacity: 0.8;
+  transform: translateX(-2px);
+}
+@media (max-width: 768px) {
+  .article-heading .heading-anchor {
+    display: none !important;
+  }
 }
 .article-body h2 {
   font-size: 1.5em;
@@ -580,6 +601,12 @@ a.read-more-btn:active {
   border-top: 1px solid var(--card-border);
   border-right: 1px solid var(--card-border);
   border-bottom: 1px solid var(--card-border);
+}
+.forest-quote p {
+  margin-bottom: 0.5em;
+}
+.forest-quote p:last-child {
+  margin-bottom: 0;
 }
 
 /* 代码块 */
@@ -629,29 +656,48 @@ a.read-more-btn:active {
   font-size: 0.9em;
 }
 
-/* 表格 */
+/* 表格容器与精致表格 */
 .table-container {
   width: 100%;
   overflow-x: auto;
-  margin: 1.5em 0;
-  border-radius: 12px;
+  margin: 1.8em 0;
+  border-radius: 14px;
   border: 2px solid var(--card-border);
+  background: var(--card-bg);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+  -webkit-overflow-scrolling: touch;
 }
 .forest-table {
   width: 100%;
+  min-width: 620px;
   border-collapse: collapse;
   text-align: left;
+  font-size: 0.92em;
 }
 .forest-table th {
   background: var(--body-bg);
   color: var(--text-primary);
-  padding: 10px 14px;
+  padding: 12px 16px;
   font-weight: 800;
   border-bottom: 2px solid var(--card-border);
+  white-space: nowrap;
+  letter-spacing: 0.3px;
 }
 .forest-table td {
-  padding: 10px 14px;
+  padding: 12px 16px;
   border-bottom: 1px solid var(--card-border);
+  color: var(--text-body);
+  line-height: 1.6;
+  vertical-align: middle;
+}
+.forest-table tbody tr:nth-child(even) {
+  background: rgba(0, 0, 0, 0.015);
+}
+.forest-table tbody tr:hover {
+  background: rgba(0, 0, 0, 0.035);
+}
+.forest-table tbody tr:last-child td {
+  border-bottom: none;
 }
 
 /* 目录 (TOC) */

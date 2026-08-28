@@ -35,7 +35,7 @@ async function run() {
 
   // 3. Article page
   console.log('Navigating to article...');
-  await page.goto('https://note.0000996.xyz/p/hello-forest-blog', { waitUntil: 'networkidle2' });
+  await page.goto('https://note.0000996.xyz/p/cloudflare-edge-blog-deploy', { waitUntil: 'networkidle2' });
   await new Promise(r => setTimeout(r, 1000));
   await page.screenshot({ path: path.join(outDir, 'preview-article.png'), fullPage: false });
   console.log('Saved preview-article.png');
