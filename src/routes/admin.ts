@@ -1,9 +1,9 @@
 import { Hono } from 'hono';
 import { Env, Post } from '../types';
-import { createToken, verifyToken, sha256 } from '../auth';
+import { createToken, verifyToken } from '../auth';
 import { 
   listPosts, getPost, createPost, updatePost, deletePost, 
-  listCategories, listLinks, getSettings, updateSetting, getStats 
+  listCategories, listTags, listLinks, getSettings, updateSetting, getStats 
 } from '../db';
 
 export const adminRouter = new Hono<{ Bindings: Env }>();
@@ -53,7 +53,7 @@ adminRouter.use('/*', async (c, next) => {
 // 2. 获取管理端文章列表
 adminRouter.get('/posts', async (c) => {
   const page = Number(c.req.query('page') || 1);
-  const limit = Number(c.req.query('limit') || 20);
+  const limit = Number(c.req.query('limit') || 50);
   const result = await listPosts(c.env, { page, limit, admin: true, status: 'all' });
   return c.json(result);
 });
@@ -159,7 +159,35 @@ adminRouter.put('/settings', async (c) => {
   return c.json({ success: true });
 });
 
-// 9. 管理后台单页应用 (Admin UI)
+// 9. 全量数据一键备份导出 (JSON 格式)
+adminRouter.get('/export', async (c) => {
+  const [settings, { posts }, categories, tags, links] = await Promise.all([
+    getSettings(c.env),
+    listPosts(c.env, { page: 1, limit: 1000, admin: true, status: 'all' }),
+    listCategories(c.env),
+    listTags(c.env),
+    listLinks(c.env)
+  ]);
+
+  const backupData = {
+    exported_at: new Date().toISOString(),
+    version: '1.0.0',
+    settings,
+    posts,
+    categories,
+    tags,
+    links
+  };
+
+  return new Response(JSON.stringify(backupData, null, 2), {
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Content-Disposition': `attachment; filename="forest-blog-backup-${new Date().toISOString().slice(0, 10)}.json"`
+    }
+  });
+});
+
+// 10. 管理后台单页应用 (Admin UI)
 export function renderAdminHtml(): string {
   return `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -202,49 +230,57 @@ export function renderAdminHtml(): string {
     .input-control { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 0.65rem 0.85rem; border-radius: 6px; margin-bottom: 1rem; outline: none; font-size: 0.92rem; }
     .input-control:focus { border-color: var(--primary); }
     
+    /* 工具栏按钮组 */
+    .editor-toolbar { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 12px; background: var(--card); border: 1px solid var(--border); border-bottom: none; border-radius: 8px 8px 0 0; }
+    .tool-btn { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; cursor: pointer; font-weight: 600; }
+    .tool-btn:hover { background: var(--border); color: var(--primary); }
+
     /* 文章列表表格 */
     .admin-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
     .admin-table th, .admin-table td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--border); text-align: left; font-size: 0.9rem; }
     .admin-table th { color: var(--text-muted); font-weight: 600; }
     
     /* Markdown 编辑器布局 */
-    .editor-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; height: calc(100vh - 180px); }
-    .editor-area { width: 100%; height: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 1rem; border-radius: 8px; resize: none; outline: none; font-family: monospace; font-size: 0.95rem; line-height: 1.6; }
+    .editor-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; height: calc(100vh - 240px); }
+    .editor-area { width: 100%; height: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 0 0 8px 8px; color: var(--text); padding: 1rem; resize: none; outline: none; font-family: monospace; font-size: 0.95rem; line-height: 1.6; }
     .preview-area { background: var(--card); border: 1px solid var(--border); padding: 1.5rem; border-radius: 8px; overflow-y: auto; line-height: 1.7; }
   </style>
 </head>
 <body>
 
   <!-- 1. 登录模块 -->
-  <div id="login-view">
-    <div class="login-card">
-      <div class="login-title">🌿 林间手记 · 后台登录</div>
-      <input type="text" id="login-user" class="input-control" placeholder="管理员账号">
-      <input type="password" id="login-pass" class="input-control" placeholder="管理员密码">
-      <button class="btn" style="width:100%;" onclick="doLogin()">立即登录</button>
-      <div id="login-msg" style="color:var(--danger);font-size:0.85rem;margin-top:0.8rem;text-align:center;"></div>
+  <div id=\"login-view\">
+    <div class=\"login-card\">
+      <div class=\"login-title\">🌿 林间手记 · 后台登录</div>
+      <input type=\"text\" id=\"login-user\" class=\"input-control\" placeholder=\"管理员账号\">
+      <input type=\"password\" id=\"login-pass\" class=\"input-control\" placeholder=\"管理员密码\">
+      <button class=\"btn\" style=\"width:100%;\" onclick=\"doLogin()\">立即登录</button>
+      <div id=\"login-msg\" style=\"color:var(--danger);font-size:0.85rem;margin-top:0.8rem;text-align:center;\"></div>
     </div>
   </div>
 
   <!-- 2. 主管理模块 -->
-  <div id="app-view">
-    <aside class="sidebar">
-      <div class="brand">🌿 Forest Admin</div>
-      <div class="menu-item active" onclick="showTab('posts')">📝 文章管理</div>
-      <div class="menu-item" onclick="newPost()">✍️ 撰写手记</div>
-      <div class="menu-item" onclick="showTab('settings')">⚙️ 站点设置</div>
-      <a href="/" target="_blank" class="menu-item" style="text-decoration:none;margin-top:auto;">🌐 查看前台</a>
-      <div class="menu-item" style="color:var(--danger);" onclick="doLogout()">🚪 退出登录</div>
+  <div id=\"app-view\">
+    <aside class=\"sidebar\">
+      <div class=\"brand\">🌿 Forest Admin</div>
+      <div class=\"menu-item active\" onclick=\"showTab('posts')\">📝 文章管理</div>
+      <div class=\"menu-item\" onclick=\"newPost()\">✍️ 撰写手记</div>
+      <div class=\"menu-item\" onclick=\"showTab('settings')\">⚙️ 站点设置</div>
+      <a href=\"/\" target=\"_blank\" class=\"menu-item\" style=\"text-decoration:none;margin-top:auto;\">🌐 查看前台</a>
+      <div class=\"menu-item\" style=\"color:var(--danger);\" onclick=\"doLogout()\">🚪 退出登录</div>
     </aside>
 
-    <main class="content-pane">
+    <main class=\"content-pane\">
       <!-- Tab 1: 文章列表 -->
-      <section id="tab-posts">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+      <section id=\"tab-posts\">
+        <div style=\"display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;\">
           <h2>文章列表</h2>
-          <button class="btn" onclick="newPost()">+ 撰写新文章</button>
+          <div style=\"display:flex;gap:0.8rem;\">
+            <button class=\"btn btn-outline\" onclick=\"exportData()\">📥 导出全站备份</button>
+            <button class=\"btn\" onclick=\"newPost()\">+ 撰写新文章</button>
+          </div>
         </div>
-        <table class="admin-table">
+        <table class=\"admin-table\">
           <thead>
             <tr>
               <th>标题</th>
@@ -255,57 +291,90 @@ export function renderAdminHtml(): string {
               <th>操作</th>
             </tr>
           </thead>
-          <tbody id="posts-tbody">
-            <tr><td colspan="6" style="text-align:center;padding:2rem;">加载中...</td></tr>
+          <tbody id=\"posts-tbody\">
+            <tr><td colspan=\"6\" style=\"text-align:center;padding:2rem;\">加载中...</td></tr>
           </tbody>
         </table>
       </section>
 
       <!-- Tab 2: 撰写/编辑文章 -->
-      <section id="tab-editor" style="display:none;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-          <h2 id="editor-title-label">撰写手记</h2>
-          <div style="display:flex;gap:0.6rem;">
-            <button class="btn btn-outline" onclick="showTab('posts')">取消</button>
-            <button class="btn" onclick="saveCurrentPost()">💾 保存并发布</button>
+      <section id=\"tab-editor\" style=\"display:none;\">
+        <div style=\"display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;\">
+          <h2 id=\"editor-title-label\">撰写手记</h2>
+          <div style=\"display:flex;gap:0.6rem;align-items:center;\">
+            <label style=\"display:flex;align-items:center;gap:6px;font-size:0.9rem;cursor:pointer;\">
+              <input type=\"checkbox\" id=\"post-pinned\"> 📌 置顶
+            </label>
+            <select id=\"post-status\" class=\"input-control\" style=\"width:auto;margin-bottom:0;padding:0.45rem 0.8rem;\">
+              <option value=\"published\">立即发布</option>
+              <option value=\"draft\">保存草稿</option>
+            </select>
+            <button class=\"btn btn-outline\" onclick=\"showTab('posts')\">取消</button>
+            <button class=\"btn\" onclick=\"saveCurrentPost()\">💾 保存手记</button>
           </div>
         </div>
 
-        <input type="hidden" id="edit-post-id">
-        <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:0.8rem;margin-bottom:0.8rem;">
-          <input type="text" id="post-title" class="input-control" placeholder="文章标题...">
-          <input type="text" id="post-slug" class="input-control" placeholder="URL Slug (如: my-post)">
-          <select id="post-category" class="input-control">
-            <option value="1">技术札记</option>
-            <option value="2">随笔思考</option>
+        <input type=\"hidden\" id=\"edit-post-id\">
+        <div style=\"display:grid;grid-template-columns:2fr 1fr 1fr;gap:0.8rem;margin-bottom:0.8rem;\">
+          <input type=\"text\" id=\"post-title\" class=\"input-control\" placeholder=\"文章标题...\">
+          <input type=\"text\" id=\"post-slug\" class=\"input-control\" placeholder=\"URL Slug (如: my-post)\">
+          <select id=\"post-category\" class=\"input-control\">
+            <option value=\"1\">技术札记</option>
+            <option value=\"2\">随笔思考</option>
           </select>
         </div>
 
-        <div style="margin-bottom:0.8rem;display:flex;gap:0.8rem;">
-          <input type="text" id="post-tags" class="input-control" style="margin-bottom:0;" placeholder="标签 (英文逗号分隔，如: Cloudflare, Linux)">
-          <input type="text" id="post-excerpt" class="input-control" style="margin-bottom:0;" placeholder="文章摘要 (选填，默认截取前 180 字)">
+        <div style=\"margin-bottom:0.8rem;display:flex;gap:0.8rem;\">
+          <input type=\"text\" id=\"post-tags\" class=\"input-control\" style=\"margin-bottom:0;\" placeholder=\"标签 (英文逗号分隔，如: Cloudflare, Linux)\">
+          <input type=\"text\" id=\"post-excerpt\" class=\"input-control\" style=\"margin-bottom:0;\" placeholder=\"文章摘要 (选填，默认截取前 180 字)\">
         </div>
 
-        <div class="editor-layout">
-          <textarea id="post-content" class="editor-area" placeholder="在此输入 Markdown 正文... 支持拖拽传图"></textarea>
-          <div id="post-preview" class="preview-area">
-            <div style="color:var(--text-muted);">实时预览区域...</div>
+        <!-- Markdown 快捷工具栏 -->
+        <div class=\"editor-toolbar\">
+          <button class=\"tool-btn\" type=\"button\" onclick=\"insertMd('**', '**', '粗体文字')\"><strong>B</strong> 粗体</button>
+          <button class=\"tool-btn\" type=\"button\" onclick=\"insertMd('*', '*', '斜体文字')\"><em>I</em> 斜体</button>
+          <button class=\"tool-btn\" type=\"button\" onclick=\"insertMd('### ', '', '三级标题')\">H3 标题</button>
+          <button class=\"tool-btn\" type=\"button\" onclick=\"insertMd('> ', '', '引用内容')\">💬 引用</button>
+          <button class=\"tool-btn\" type=\"button\" onclick=\"insertMd('[', '](https://)', '链接文本')\">🔗 链接</button>
+          <button class=\"tool-btn\" type=\"button\" onclick=\"insertMd('![图片描述](', ')', 'https://example.com/img.png')\">🖼️ 图片</button>
+          <button class=\"tool-btn\" type=\"button\" onclick=\"insertMd('\\n\`\`\`javascript\\n', '\\n\`\`\`\\n', '// 代码块')\">💻 代码块</button>
+          <button class=\"tool-btn\" type=\"button\" onclick=\"insertMd('\\n| 表头 1 | 表头 2 |\\n| :--- | :--- |\\n| 内容 1 | 内容 2 |\\n', '', '')\">📊 表格</button>
+        </div>
+
+        <div class=\"editor-layout\">
+          <textarea id=\"post-content\" class=\"editor-area\" placeholder=\"在此输入 Markdown 正文...\"></textarea>
+          <div id=\"post-preview\" class=\"preview-area\">
+            <div style=\"color:var(--text-muted);\">实时预览区域 (输入内容即可更新)...</div>
           </div>
         </div>
       </section>
 
       <!-- Tab 3: 站点设置 -->
-      <section id="tab-settings" style="display:none;max-width:600px;">
-        <h2 style="margin-bottom:1.5rem;">站点通用设置</h2>
-        <label style="font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:0.3rem;">站点主标题</label>
-        <input type="text" id="set-site-title" class="input-control">
-        <label style="font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:0.3rem;">副标题 / Slogan</label>
-        <input type="text" id="set-site-subtitle" class="input-control">
-        <label style="font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:0.3rem;">全站描述 (SEO)</label>
-        <input type="text" id="set-site-desc" class="input-control">
-        <label style="font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:0.3rem;">站长作者名</label>
-        <input type="text" id="set-site-author" class="input-control">
-        <button class="btn" style="margin-top:1rem;" onclick="saveSettings()">💾 保存配置</button>
+      <section id=\"tab-settings\" style=\"display:none;max-width:680px;\">
+        <h2 style=\"margin-bottom:1.5rem;\">站点与服务配置</h2>
+        
+        <h3 style=\"font-size:1.05rem;color:var(--primary);margin-bottom:0.8rem;\">基础信息</h3>
+        <label style=\"font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:0.3rem;\">站点主标题</label>
+        <input type=\"text\" id=\"set-site-title\" class=\"input-control\">
+        <label style=\"font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:0.3rem;\">副标题 / Slogan</label>
+        <input type=\"text\" id=\"set-site-subtitle\" class=\"input-control\">
+        <label style=\"font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:0.3rem;\">全站描述 (SEO)</label>
+        <input type=\"text\" id=\"set-site-desc\" class=\"input-control\">
+        <label style=\"font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:0.3rem;\">站长作者名</label>
+        <input type=\"text\" id=\"set-site-author\" class=\"input-control\">
+
+        <h3 style=\"font-size:1.05rem;color:var(--primary);margin-top:1.5rem;margin-bottom:0.8rem;\">Giscus 评论系统配置 (选填)</h3>
+        <p style=\"font-size:0.82rem;color:var(--text-muted);margin-bottom:0.8rem;\">基于 GitHub Discussions 的无服务器零成本评论，前往 <a href=\"https://giscus.app\" target=\"_blank\" style=\"color:var(--primary);\">giscus.app</a> 获取参数填入：</p>
+        <label style=\"font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:0.3rem;\">GitHub 仓库 (例如: username/repo)</label>
+        <input type=\"text\" id=\"set-giscus-repo\" class=\"input-control\" placeholder=\"例如: shali10/forest-blog\">
+        <label style=\"font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:0.3rem;\">仓库 ID (data-repo-id)</label>
+        <input type=\"text\" id=\"set-giscus-repoid\" class=\"input-control\" placeholder=\"例如: R_kgD...\">
+        <label style=\"font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:0.3rem;\">讨论分类名称 (data-category)</label>
+        <input type=\"text\" id=\"set-giscus-cat\" class=\"input-control\" placeholder=\"例如: General 或 Announcements\">
+        <label style=\"font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:0.3rem;\">分类 ID (data-category-id)</label>
+        <input type=\"text\" id=\"set-giscus-catid\" class=\"input-control\" placeholder=\"例如: DIC_kwD...\">
+
+        <button class=\"btn\" style=\"margin-top:1.5rem;\" onclick=\"saveSettings()\">💾 保存全站配置</button>
       </section>
     </main>
   </div>
@@ -364,19 +433,22 @@ export function renderAdminHtml(): string {
       const data = await res.json();
       const tbody = document.getElementById('posts-tbody');
       if (!data.posts || data.posts.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;">暂无文章</td></tr>';
+        tbody.innerHTML = '<tr><td colspan=\"6\" style=\"text-align:center;padding:2rem;\">暂无文章</td></tr>';
         return;
       }
       tbody.innerHTML = data.posts.map(p => \`
         <tr>
-          <td><strong>\${escapeHtml(p.title)}</strong></td>
-          <td style="color:var(--text-muted);font-family:monospace;">\${p.slug}</td>
-          <td><span style="background:var(--border);padding:0.2rem 0.4rem;border-radius:4px;font-size:0.8rem;">\${p.category_name}</span></td>
+          <td>
+            \${p.pinned ? '<span style=\"background:#EE5253;color:#FFF;padding:2px 6px;border-radius:4px;font-size:0.75rem;margin-right:4px;\">置顶</span>' : ''}
+            <strong>\${escapeHtml(p.title)}</strong>
+          </td>
+          <td style=\"color:var(--text-muted);font-family:monospace;\">\${p.slug}</td>
+          <td><span style=\"background:var(--border);padding:0.2rem 0.4rem;border-radius:4px;font-size:0.8rem;\">\${p.category_name}</span></td>
           <td>\${p.status === 'published' ? '<span style=\"color:var(--primary);\">已发布</span>' : '<span style=\"color:var(--text-muted);\">草稿</span>'}</td>
           <td>\${p.views}</td>
           <td>
-            <button class="btn btn-outline" style="padding:0.2rem 0.6rem;font-size:0.8rem;" onclick="editPost(\${p.id})">编辑</button>
-            <button class="btn btn-danger" style="padding:0.2rem 0.6rem;font-size:0.8rem;" onclick="deletePostItem(\${p.id})">删除</button>
+            <button class=\"btn btn-outline\" style=\"padding:0.2rem 0.6rem;font-size:0.8rem;\" onclick=\"editPost(\${p.id})\">编辑</button>
+            <button class=\"btn btn-danger\" style=\"padding:0.2rem 0.6rem;font-size:0.8rem;\" onclick=\"deletePostItem(\${p.id})\">删除</button>
           </td>
         </tr>
       \`).join('');
@@ -389,6 +461,8 @@ export function renderAdminHtml(): string {
       document.getElementById('post-content').value = '';
       document.getElementById('post-tags').value = '';
       document.getElementById('post-excerpt').value = '';
+      document.getElementById('post-pinned').checked = false;
+      document.getElementById('post-status').value = 'published';
       document.getElementById('post-preview').innerHTML = '<div style=\"color:var(--text-muted);\">实时预览...</div>';
       document.getElementById('editor-title-label').textContent = '撰写手记';
       showTab('editor');
@@ -405,8 +479,22 @@ export function renderAdminHtml(): string {
       document.getElementById('post-content').value = p.content;
       document.getElementById('post-tags').value = p.tags;
       document.getElementById('post-excerpt').value = p.excerpt || '';
+      document.getElementById('post-pinned').checked = p.pinned === 1;
+      document.getElementById('post-status').value = p.status || 'published';
       document.getElementById('editor-title-label').textContent = '编辑手记 #' + p.id;
       showTab('editor');
+    }
+
+    // Markdown 快捷插入辅助
+    function insertMd(prefix, suffix, defaultText) {
+      const area = document.getElementById('post-content');
+      const start = area.selectionStart;
+      const end = area.selectionEnd;
+      const selected = area.value.substring(start, end) || defaultText;
+      const replacement = prefix + selected + suffix;
+      area.value = area.value.substring(0, start) + replacement + area.value.substring(end);
+      area.focus();
+      area.setSelectionRange(start + prefix.length, start + prefix.length + selected.length);
     }
 
     async function saveCurrentPost() {
@@ -419,6 +507,8 @@ export function renderAdminHtml(): string {
       const catSelect = document.getElementById('post-category');
       const category_id = Number(catSelect.value);
       const category_name = catSelect.options[catSelect.selectedIndex].text;
+      const pinned = document.getElementById('post-pinned').checked ? 1 : 0;
+      const status = document.getElementById('post-status').value;
 
       if (!title || !content) {
         alert('标题与正文不能为空');
@@ -434,7 +524,7 @@ export function renderAdminHtml(): string {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + localStorage.getItem('forest_token')
         },
-        body: JSON.stringify({ title, slug, content, tags, excerpt, category_id, category_name, status: 'published' })
+        body: JSON.stringify({ title, slug, content, tags, excerpt, category_id, category_name, status, pinned })
       });
 
       const data = await res.json();
@@ -467,13 +557,23 @@ export function renderAdminHtml(): string {
       document.getElementById('set-site-subtitle').value = s.site_subtitle || '';
       document.getElementById('set-site-desc').value = s.site_description || '';
       document.getElementById('set-site-author').value = s.site_author || '';
+      document.getElementById('set-giscus-repo').value = s.giscus_repo || '';
+      document.getElementById('set-giscus-repoid').value = s.giscus_repo_id || '';
+      document.getElementById('set-giscus-cat').value = s.giscus_category || '';
+      document.getElementById('set-giscus-catid').value = s.giscus_category_id || '';
     }
 
     async function saveSettings() {
-      const site_title = document.getElementById('set-site-title').value.trim();
-      const site_subtitle = document.getElementById('set-site-subtitle').value.trim();
-      const site_description = document.getElementById('set-site-desc').value.trim();
-      const site_author = document.getElementById('set-site-author').value.trim();
+      const payload = {
+        site_title: document.getElementById('set-site-title').value.trim(),
+        site_subtitle: document.getElementById('set-site-subtitle').value.trim(),
+        site_description: document.getElementById('set-site-desc').value.trim(),
+        site_author: document.getElementById('set-site-author').value.trim(),
+        giscus_repo: document.getElementById('set-giscus-repo').value.trim(),
+        giscus_repo_id: document.getElementById('set-giscus-repoid').value.trim(),
+        giscus_category: document.getElementById('set-giscus-cat').value.trim(),
+        giscus_category_id: document.getElementById('set-giscus-catid').value.trim(),
+      };
 
       const res = await fetch('/api/admin/settings', {
         method: 'PUT',
@@ -481,10 +581,14 @@ export function renderAdminHtml(): string {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + localStorage.getItem('forest_token')
         },
-        body: JSON.stringify({ site_title, site_subtitle, site_description, site_author })
+        body: JSON.stringify(payload)
       });
       const data = await res.json();
       if (data.success) alert('设置已更新！');
+    }
+
+    async function exportData() {
+      window.open('/api/admin/export', '_blank');
     }
 
     function escapeHtml(s) {

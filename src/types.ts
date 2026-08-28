@@ -59,6 +59,11 @@ export interface SiteSettings {
   site_avatar: string;
   site_favicon: string;
   admin_username: string;
+  giscus_repo?: string;
+  giscus_repo_id?: string;
+  giscus_category?: string;
+  giscus_category_id?: string;
+  giscus_mapping?: string;
 }
 
 export interface Pagination {

@@ -9,16 +9,19 @@ export async function getSettings(env: Env): Promise<SiteSettings> {
     site_author: env.SITE_AUTHOR || 'root',
     site_avatar: '/assets/avatar.png',
     site_favicon: '/assets/favicon.svg',
-    admin_username: env.ADMIN_USERNAME || 'admin'
+    admin_username: env.ADMIN_USERNAME || 'admin',
+    giscus_repo: '',
+    giscus_repo_id: '',
+    giscus_category: '',
+    giscus_category_id: '',
+    giscus_mapping: 'pathname'
   };
 
   try {
     const { results } = await env.DB.prepare('SELECT key, value FROM settings').all<{ key: string; value: string }>();
     if (results && results.length > 0) {
       for (const row of results) {
-        if (row.key in defaults) {
-          (defaults as any)[row.key] = row.value;
-        }
+        (defaults as any)[row.key] = row.value;
       }
     }
   } catch (e) {

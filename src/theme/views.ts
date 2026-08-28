@@ -17,6 +17,9 @@ interface BaseLayoutProps {
   settings: SiteSettings;
   title?: string;
   description?: string;
+  image?: string;
+  url?: string;
+  type?: string;
   content: string;
 }
 
@@ -25,6 +28,9 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
     ? `${props.title} - ${props.settings.site_title}` 
     : `${props.settings.site_title} · ${props.settings.site_subtitle}`;
   const pageDesc = props.description || props.settings.site_description;
+  const ogImage = props.image || props.settings.site_avatar || 'https://api.dicebear.com/7.x/bottts/svg?seed=forest&backgroundColor=e6f9f6';
+  const ogType = props.type || 'website';
+  const canonicalUrl = props.url || '';
 
   return `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -34,13 +40,34 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
   <title>${escapeHtml(pageTitle)}</title>
   <meta name="description" content="${escapeHtml(pageDesc)}">
   <meta name="author" content="${escapeHtml(props.settings.site_author)}">
+  
+  <!-- OpenGraph 社交卡片 -->
+  <meta property="og:title" content="${escapeHtml(pageTitle)}">
+  <meta property="og:description" content="${escapeHtml(pageDesc)}">
+  <meta property="og:type" content="${escapeHtml(ogType)}">
+  <meta property="og:image" content="${escapeHtml(ogImage)}">
+  ${canonicalUrl ? `<meta property="og:url" content="${escapeHtml(canonicalUrl)}">` : ''}
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${escapeHtml(pageTitle)}">
+  <meta name="twitter:description" content="${escapeHtml(pageDesc)}">
+  <meta name="twitter:image" content="${escapeHtml(ogImage)}">
+
   <link rel="alternate" type="application/rss+xml" title="${escapeHtml(props.settings.site_title)}" href="/rss.xml">
   <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
   
-  <!-- 零闪烁多主题初始化脚本 -->
+  <!-- 零闪烁多主题初始化脚本 (支持系统深色偏好智能自适应) -->
   <script>
     (function() {
-      const stored = localStorage.getItem('forest-theme-name') || 'forest';
+      let stored = localStorage.getItem('forest-theme-name');
+      if (!stored) {
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          stored = 'cyber';
+        } else {
+          stored = 'forest';
+        }
+      }
       document.documentElement.setAttribute('data-theme', stored);
     })();
   </script>
@@ -48,6 +75,9 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
   <style>${forestThemeCss}</style>
 </head>
 <body>
+
+  <!-- 顶部阅读进度条 -->
+  <div id="reading-progress-bar"></div>
 
   <!-- 移动端抽屉开关按钮 -->
   <button class="mobile-nav-toggle" onclick="toggleNav()" title="菜单">☰</button>
@@ -74,9 +104,12 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
     ${props.content}
   </main>
 
+  <!-- 悬浮回到顶部按钮 -->
+  <button id="backToTopBtn" class="back-to-top-btn" onclick="scrollToTop()" title="回到顶部">↑</button>
+
   <!-- 页脚 -->
   <footer>
-    <p>© ${new Date().getFullYear()} <a href="/">${escapeHtml(props.settings.site_title)}</a> · Powered by Cloudflare Workers + D1 · <a href="/rss.xml">RSS</a></p>
+    <p>© ${new Date().getFullYear()} <a href="/">${escapeHtml(props.settings.site_title)}</a> · Powered by Cloudflare Workers + D1 · <a href="/rss.xml">RSS</a> · <a href="/sitemap.xml">Sitemap</a></p>
   </footer>
 
   <!-- 多主题配色切换弹窗 -->
@@ -133,7 +166,40 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
     </div>
   </div>
 
+  <!-- 图片放大灯箱 Modal -->
+  <div id="img-lightbox" class="img-lightbox-modal" onclick="closeLightbox()">
+    <img id="lightbox-img" src="" alt="Zoomed">
+  </div>
+
+  <!-- 轻量 Prism.js 语法着色 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" data-manual></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+
   <script>
+    // 页面滚动监听：进度条 + 回到顶部
+    const progressBar = document.getElementById('reading-progress-bar');
+    const backToTopBtn = document.getElementById('backToTopBtn');
+
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      if (scrollHeight > 0) {
+        const progress = Math.min(100, Math.max(0, (scrollTop / scrollHeight) * 100));
+        if (progressBar) progressBar.style.width = progress + '%';
+      }
+      if (backToTopBtn) {
+        if (scrollTop > 280) {
+          backToTopBtn.classList.add('show');
+        } else {
+          backToTopBtn.classList.remove('show');
+        }
+      }
+    }, { passive: true });
+
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     // 移动端抽屉切换
     function toggleNav() {
       const sidebar = document.querySelector('.sidebar');
@@ -155,6 +221,15 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
       document.documentElement.setAttribute('data-theme', name);
       localStorage.setItem('forest-theme-name', name);
       closeThemeModal();
+
+      // 同步更新 Giscus 评论区主题
+      const giscusFrame = document.querySelector('iframe.giscus-frame');
+      if (giscusFrame) {
+        const giscusTheme = (name === 'cyber' || name === 'geek') ? 'dark' : 'light';
+        giscusFrame.contentWindow.postMessage({
+          giscus: { setConfig: { theme: giscusTheme } }
+        }, 'https://giscus.app');
+      }
     }
 
     // 搜索弹窗逻辑
@@ -179,6 +254,7 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
       if (e.key === 'Escape') {
         if (modal.classList.contains('open')) closeSearch();
         if (document.getElementById('theme-modal').classList.contains('open')) closeThemeModal();
+        closeLightbox();
       }
     });
 
@@ -207,6 +283,30 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
           searchResults.innerHTML = '<div style="padding:1rem;text-align:center;color:#E87A5D;">检索失败</div>';
         }
       }, 200);
+    });
+
+    // 图片灯箱放大逻辑
+    function openLightbox(src) {
+      const lb = document.getElementById('img-lightbox');
+      const img = document.getElementById('lightbox-img');
+      img.src = src;
+      lb.classList.add('open');
+    }
+    function closeLightbox() {
+      const lb = document.getElementById('img-lightbox');
+      if (lb) lb.classList.remove('open');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // 激活文章内图片点击放大
+      document.querySelectorAll('.article-body img').forEach(img => {
+        img.addEventListener('click', () => openLightbox(img.src));
+      });
+
+      // 运行 Prism 语法着色
+      if (window.Prism) {
+        Prism.highlightAll();
+      }
     });
 
     function escapeHtml(s) {
@@ -320,17 +420,23 @@ export function renderHomeView(props: {
     const dateStr = p.created_at.slice(0, 10);
     const emojis = ['📖', '💡', '🌲', '⚡', '🍂', '☕', '🎨'];
     const emoji = emojis[idx % emojis.length];
+    const isPinned = p.pinned === 1;
 
     return `
       <article class="post-card">
         <div class="post-cover">${emoji}</div>
         <div class="post-content">
           <div>
-            <h2><a href="/p/${p.slug}">${escapeHtml(p.title)}</a></h2>
+            <h2>
+              ${isPinned ? '<span class="pinned-badge">📌 置顶</span>' : ''}
+              <a href="/p/${p.slug}">${escapeHtml(p.title)}</a>
+            </h2>
             <div class="excerpt">${escapeHtml(p.excerpt || '')}</div>
           </div>
           <div class="meta-bar">
             <div class="meta-left">
+              <span>🏷️ ${escapeHtml(p.category_name)}</span>
+              <span>·</span>
               <span>📅 ${dateStr}</span>
               <span>·</span>
               <span>👁️ ${p.views} 次浏览</span>
@@ -419,6 +525,29 @@ export function renderPostView(props: {
     </div>
   ` : '';
 
+  // Giscus 评论区模块
+  const giscusHtml = props.settings.giscus_repo ? `
+    <div class="giscus-wrap">
+      <div class="giscus-title">💬 交流与讨论</div>
+      <div class="giscus"></div>
+      <script src="https://giscus.app/client.js"
+        data-repo="${escapeHtml(props.settings.giscus_repo)}"
+        data-repo-id="${escapeHtml(props.settings.giscus_repo_id || '')}"
+        data-category="${escapeHtml(props.settings.giscus_category || '')}"
+        data-category-id="${escapeHtml(props.settings.giscus_category_id || '')}"
+        data-mapping="${escapeHtml(props.settings.giscus_mapping || 'pathname')}"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="top"
+        data-theme="preferred_color_scheme"
+        data-lang="zh-CN"
+        crossorigin="anonymous"
+        async>
+      </script>
+    </div>
+  ` : '';
+
   const mainArticleCol = `
     <div style="flex:1;min-width:0;">
       <div class="article-container">
@@ -448,6 +577,8 @@ export function renderPostView(props: {
           </div>
           <a href="/" class="read-more-btn">← 返回首页</a>
         </div>
+
+        ${giscusHtml}
       </div>
     </div>
   `;
@@ -456,6 +587,7 @@ export function renderPostView(props: {
     settings: props.settings,
     title: props.post.title,
     description: props.post.excerpt,
+    type: 'article',
     content: leftSidebar + mainArticleCol
   });
 }

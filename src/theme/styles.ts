@@ -23,6 +23,7 @@ export const forestThemeCss = `
   --btn-bg: #19C8B9;
   --btn-shadow: #11A89B;
   --cover-bg: linear-gradient(135deg, #E6F9F6, #D2F2EC);
+  --code-bg: #282C34;
 }
 
 /* 2. 落樱和风 (Sakura Sweet) */
@@ -37,6 +38,7 @@ export const forestThemeCss = `
   --btn-bg: #E87A90;
   --btn-shadow: #C4576D;
   --cover-bg: linear-gradient(135deg, #FFE5EC, #FFD1DC);
+  --code-bg: #2E2528;
 }
 
 /* 3. 宇治抹茶 (Matcha Zen) */
@@ -51,6 +53,7 @@ export const forestThemeCss = `
   --btn-bg: #557A46;
   --btn-shadow: #3D5832;
   --cover-bg: linear-gradient(135deg, #E0EBD4, #CDE0BC);
+  --code-bg: #232B20;
 }
 
 /* 4. 星野深蓝 (Starry Ocean) */
@@ -65,6 +68,7 @@ export const forestThemeCss = `
   --btn-bg: #3E78B2;
   --btn-shadow: #285582;
   --cover-bg: linear-gradient(135deg, #DCE7F3, #C7D9EC);
+  --code-bg: #1E2734;
 }
 
 /* 5. Geist 极简极客 (Geist Monochrome) */
@@ -79,6 +83,7 @@ export const forestThemeCss = `
   --btn-bg: #0366D6;
   --btn-shadow: #024EA4;
   --cover-bg: linear-gradient(135deg, #EAEFF5, #DCE3EB);
+  --code-bg: #1B1F23;
 }
 
 /* 6. 赛博深邃暗夜 (Cyber Dark) */
@@ -93,6 +98,7 @@ export const forestThemeCss = `
   --btn-bg: #38BDF8;
   --btn-shadow: #0284C7;
   --cover-bg: linear-gradient(135deg, #242938, #181C26);
+  --code-bg: #0F131A;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -109,6 +115,56 @@ body {
 button, input, select, textarea { font-family: inherit; }
 a { color: var(--btn-bg); text-decoration: none; transition: all 0.2s; }
 a:hover { filter: brightness(0.9); }
+
+/* 顶部平滑阅读进度条 */
+#reading-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: var(--btn-bg);
+  z-index: 1005;
+  width: 0%;
+  transition: width 0.1s linear;
+  box-shadow: 0 0 10px var(--btn-bg);
+}
+
+/* 悬浮回到顶部按钮 */
+.back-to-top-btn {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--card-bg);
+  border: 2px solid var(--card-border);
+  color: var(--text-primary);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 800;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(12px);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 998;
+}
+.back-to-top-btn.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+.back-to-top-btn:hover {
+  background: var(--btn-bg);
+  color: #fff;
+  border-color: var(--btn-bg);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+}
 
 /* 移动端汉堡包抽屉按钮 */
 .mobile-nav-toggle {
@@ -207,7 +263,7 @@ header p {
   transform: translateY(-1px);
 }
 
-/* 多主题切换弹窗/选择器 */
+/* 多主题切换弹窗 */
 .theme-modal {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -389,6 +445,22 @@ main {
   transform: translateY(-2px);
   box-shadow: 0 4px 10px rgba(0,0,0,0.15);
   filter: brightness(0.95);
+}
+
+/* 置顶文章标签 */
+.pinned-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: linear-gradient(135deg, #FF6B6B, #EE5253);
+  color: #fff !important;
+  font-size: 0.72em;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 6px;
+  margin-right: 8px;
+  vertical-align: middle;
+  box-shadow: 0 2px 6px rgba(238, 82, 83, 0.3);
 }
 
 /* 文章列表项卡片 (Post Card) */
@@ -590,6 +662,49 @@ a.read-more-btn:active {
 .article-body ul, .article-body ol { margin-bottom: 1.25em; padding-left: 1.6em; }
 .article-body li { margin-bottom: 0.4em; }
 
+/* 文章内图片与 Lightbox 悬停效果 */
+.article-body img {
+  max-width: 100%;
+  border-radius: 14px;
+  border: 2px solid var(--card-border);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  margin: 1.4em auto;
+  display: block;
+  cursor: zoom-in;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.article-body img:hover {
+  transform: scale(1.01);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+}
+
+/* 图片放大灯箱 Modal */
+.img-lightbox-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  cursor: zoom-out;
+}
+.img-lightbox-modal.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.img-lightbox-modal img {
+  max-width: 92vw;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 10px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+}
+
 /* 治愈系引用卡片 */
 .forest-quote {
   background: var(--body-bg);
@@ -611,14 +726,15 @@ a.read-more-btn:active {
 
 /* 代码块 */
 .code-block {
-  background: #282C34;
+  background: var(--code-bg);
   border-radius: 14px;
   margin: 1.6em 0;
   overflow: hidden;
   box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+  border: 1px solid rgba(255,255,255,0.06);
 }
 .code-header {
-  background: #21252B;
+  background: rgba(0,0,0,0.25);
   padding: 8px 16px;
   display: flex;
   justify-content: space-between;
@@ -643,8 +759,8 @@ a.read-more-btn:active {
   overflow-x: auto;
   font-family: var(--font-mono);
   font-size: 0.9em;
-  color: #ABB2BF;
-  line-height: 1.6;
+  color: #E2E8F0;
+  line-height: 1.65;
 }
 :not(pre) > code {
   font-family: var(--font-mono);
@@ -655,6 +771,16 @@ a.read-more-btn:active {
   border: 1px solid var(--card-border);
   font-size: 0.9em;
 }
+
+/* Prism 语法着色增强 (One Dark 配色) */
+.token.comment, .token.prolog, .token.doctype, .token.cdata { color: #7F848E; font-style: italic; }
+.token.punctuation { color: #ABB2BF; }
+.token.property, .token.tag, .token.boolean, .token.number, .token.constant, .token.symbol { color: #D19A66; }
+.token.selector, .token.attr-name, .token.string, .token.char, .token.builtin, .token.inserted { color: #98C379; }
+.token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string { color: #56B6C2; }
+.token.atrule, .token.attr-value, .token.keyword { color: #C678DD; }
+.token.function, .token.class-name { color: #61AFEF; }
+.token.regex, .token.important, .token.variable { color: #E06C75; }
 
 /* 表格容器与精致表格 */
 .table-container {
@@ -717,6 +843,22 @@ a.read-more-btn:active {
 .toc-card ul { list-style: none; padding-left: 0; }
 .toc-card li { margin-bottom: 6px; font-weight: 600; font-size: 0.92em; }
 .toc-card .toc-item-3 { padding-left: 16px; font-size: 0.86em; }
+
+/* Giscus 评论区容器 */
+.giscus-wrap {
+  margin-top: 35px;
+  padding-top: 25px;
+  border-top: 2px dashed var(--card-border);
+}
+.giscus-title {
+  font-size: 1.25em;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
 /* 搜索弹窗 */
 .modal-backdrop {
