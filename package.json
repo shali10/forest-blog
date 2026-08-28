@@ -1,0 +1,23 @@
+{
+  "name": "forest-blog",
+  "version": "1.0.0",
+  "description": "Next-Gen Serverless Edge Blog powered by Cloudflare Workers, D1, R2 and Hono",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:init": "wrangler d1 execute forest-blog-db --local --file=./schema.sql",
+    "db:init:remote": "wrangler d1 execute forest-blog-db --remote --file=./schema.sql",
+    "build": "tsc --noEmit"
+  },
+  "dependencies": {
+    "hono": "^4.7.4",
+    "marked": "^15.0.7"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260828.1",
+    "tsx": "^4.23.12",
+    "typescript": "^5.7.3",
+    "wrangler": "^4.127.0"
+  }
+}

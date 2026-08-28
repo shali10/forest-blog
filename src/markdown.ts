@@ -1,0 +1,117 @@
+import { marked } from 'marked';
+
+export interface TocItem {
+  id: string;
+  text: string;
+  level: number;
+}
+
+export interface MarkdownRenderResult {
+  html: string;
+  toc: TocItem[];
+  wordCount: number;
+  readTimeMin: number;
+}
+
+export function renderMarkdown(markdownText: string): MarkdownRenderResult {
+  if (!markdownText) {
+    return { html: '', toc: [], wordCount: 0, readTimeMin: 1 };
+  }
+
+  // 1. 清理常见扩展锚点语法中的污染，如 "## 标题 {#features}"
+  let cleanMd = markdownText.replace(/\s*\{#[a-zA-Z0-9_-]+\}/g, '');
+
+  // 2. 统计字数与估算阅读时间
+  const cleanText = cleanMd.replace(/[#*`~>_[\]()\-+]/g, ' ').replace(/\s+/g, ' ');
+  const chineseChars = (cleanText.match(/[\u4e00-\u9fa5]/g) || []).length;
+  const englishWords = (cleanText.match(/[a-zA-Z0-9_-]+/g) || []).length;
+  const wordCount = chineseChars + englishWords;
+  const readTimeMin = Math.max(1, Math.ceil(chineseChars / 350 + englishWords / 160));
+
+  // 3. 提取 TOC
+  const toc: TocItem[] = [];
+  let headingIdCounter = 1;
+
+  const renderer = new marked.Renderer();
+
+  // 自定义标题渲染（生成锚点与 TOC）
+  renderer.heading = ({ text, depth }) => {
+    const rawText = text.replace(/<[^>]+>/g, '').trim();
+    const anchorId = `heading-${headingIdCounter++}-${rawText.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '-')}`;
+    
+    if (depth >= 2 && depth <= 4) {
+      toc.push({
+        id: anchorId,
+        text: rawText,
+        level: depth
+      });
+    }
+
+    return `<h${depth} id="${anchorId}" class="article-heading">
+      <a href="#${anchorId}" class="heading-anchor" aria-hidden="true">#</a>
+      <span>${text}</span>
+    </h${depth}>`;
+  };
+
+  // 自定义代码块渲染（支持语言徽章与复制属性）
+  renderer.code = ({ text, lang }) => {
+    const language = lang || 'text';
+    const escapedCode = escapeHtml(text);
+    return `<div class="code-block" data-lang="${language}">
+      <div class="code-header">
+        <span class="code-lang">${language}</span>
+        <button class="copy-btn" onclick="navigator.clipboard.writeText(decodeURIComponent('${encodeURIComponent(text)}')).then(()=>{this.textContent='已复制!';setTimeout(()=>this.textContent='复制',2000)})">复制</button>
+      </div>
+      <pre><code class="language-${language}">${escapedCode}</code></pre>
+    </div>`;
+  };
+
+  // 自定义表格渲染（自动包裹横向自适应容器，移动端友好）
+  renderer.table = (headerAndBody) => {
+    const header = headerAndBody.header;
+    const body = headerAndBody.rows.map(row => `<tr>${row.map(cell => `<td>${cell.text}</td>`).join('')}</tr>`).join('');
+    return `<div class="table-container">
+      <table class="forest-table">
+        <thead>${header}</thead>
+        <tbody>${body}</tbody>
+      </table>
+    </div>`;
+  };
+
+  // 自定义引用块
+  renderer.blockquote = ({ text }) => {
+    return `<blockquote class="forest-quote">${text}</blockquote>`;
+  };
+
+  // 自定义链接（安全外链属性）
+  renderer.link = ({ href, title, text }) => {
+    const isExternal = href.startsWith('http://') || href.startsWith('https://');
+    const targetAttr = isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
+    const titleAttr = title ? ` title="${escapeHtml(title)}"` : '';
+    return `<a href="${escapeHtml(href)}"${titleAttr}${targetAttr}>${text}</a>`;
+  };
+
+  marked.setOptions({
+    gfm: true,
+    breaks: true,
+    renderer
+  });
+
+  const rawHtml = marked.parse(cleanMd) as string;
+
+  return {
+    html: rawHtml,
+    toc,
+    wordCount,
+    readTimeMin
+  };
+}
+
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
