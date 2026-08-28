@@ -65,7 +65,7 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
           stored = 'cyber';
         } else {
-          stored = 'forest';
+          stored = 'akari';
         }
       }
       document.documentElement.setAttribute('data-theme', stored);
@@ -139,27 +139,39 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
       <p style="font-size:0.85em;color:var(--text-secondary);margin-bottom:12px;">实时切换，自动保存到本地偏好</p>
       
       <div class="theme-grid">
-        <button class="theme-option-btn" onclick="selectTheme('forest')">
-          <span class="theme-dot" style="background:#7DC395;"></span>
+        <button class="theme-option-btn" data-theme-id="akari" onclick="selectTheme('akari')">
+          <span class="theme-dot" style="background:#C86235;"></span>
+          <span>🏮 晚灯手记</span>
+        </button>
+        <button class="theme-option-btn" data-theme-id="vintage" onclick="selectTheme('vintage')">
+          <span class="theme-dot" style="background:#8A4E2A;"></span>
+          <span>📜 复古报刊</span>
+        </button>
+        <button class="theme-option-btn" data-theme-id="caramel" onclick="selectTheme('caramel')">
+          <span class="theme-dot" style="background:#D47833;"></span>
+          <span>☕ 暖木中古</span>
+        </button>
+        <button class="theme-option-btn" data-theme-id="forest" onclick="selectTheme('forest')">
+          <span class="theme-dot" style="background:#4A855A;"></span>
           <span>🌿 森系温润</span>
         </button>
-        <button class="theme-option-btn" onclick="selectTheme('sakura')">
-          <span class="theme-dot" style="background:#F8A6B2;"></span>
+        <button class="theme-option-btn" data-theme-id="sakura" onclick="selectTheme('sakura')">
+          <span class="theme-dot" style="background:#E26D82;"></span>
           <span>🌸 落樱和风</span>
         </button>
-        <button class="theme-option-btn" onclick="selectTheme('matcha')">
-          <span class="theme-dot" style="background:#7A9D54;"></span>
+        <button class="theme-option-btn" data-theme-id="matcha" onclick="selectTheme('matcha')">
+          <span class="theme-dot" style="background:#5E823C;"></span>
           <span>🍵 宇治抹茶</span>
         </button>
-        <button class="theme-option-btn" onclick="selectTheme('ocean')">
+        <button class="theme-option-btn" data-theme-id="ocean" onclick="selectTheme('ocean')">
           <span class="theme-dot" style="background:#3E78B2;"></span>
           <span>🌌 星野深蓝</span>
         </button>
-        <button class="theme-option-btn" onclick="selectTheme('geek')">
+        <button class="theme-option-btn" data-theme-id="geek" onclick="selectTheme('geek')">
           <span class="theme-dot" style="background:#24292E;"></span>
           <span>⚡ Geist 极客</span>
         </button>
-        <button class="theme-option-btn" onclick="selectTheme('cyber')">
+        <button class="theme-option-btn" data-theme-id="cyber" onclick="selectTheme('cyber')">
           <span class="theme-dot" style="background:#1B1E28;border-color:#38BDF8;"></span>
           <span>🌙 赛博深夜</span>
         </button>
@@ -284,6 +296,14 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
 
     // 主题切换逻辑
     function openThemeModal() {
+      const current = document.documentElement.getAttribute('data-theme') || 'akari';
+      document.querySelectorAll('.theme-option-btn').forEach(btn => {
+        if (btn.getAttribute('data-theme-id') === current) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
       document.getElementById('theme-modal').classList.add('open');
     }
     function closeThemeModal() {

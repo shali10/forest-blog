@@ -1,6 +1,6 @@
 // ==========================================================
-// 经典温暖手帐风 + 多主题配色系统 (6 套精调高级主题)
-// 包含：森系温润、落樱和风、极简极客、宇治抹茶、星野深蓝、赛博极夜
+// 经典温暖手帐风 + 多主题配色系统 (9 套精调高级主题)
+// 包含：晚灯手记(Akari)、复古报刊、暖木中古、森系温润、落樱和风、宇治抹茶、星野深蓝、极简极客、赛博深夜
 // ==========================================================
 
 export const forestThemeCss = `
@@ -11,52 +11,97 @@ export const forestThemeCss = `
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-/* 1. 默认：森系手帐 (Forest Warm) */
-:root, [data-theme="forest"] {
-  --header-bg: linear-gradient(135deg, #6FB987, #4E9F6E);
-  --card-bg: #F7F3DF;
-  --card-border: #E8E0CC;
-  --body-bg: #F8F8F0;
-  --text-primary: #794F27;
-  --text-body: #725D42;
-  --text-secondary: #9F927D;
-  --btn-bg: #19C8B9;
-  --btn-shadow: #11A89B;
-  --cover-bg: linear-gradient(135deg, #E6F9F6, #D2F2EC);
-  --code-bg: #282C34;
+/* 1. 默认：晚灯手记 (Akari Vintage - 契合 blog.0000996.xyz 温暖手帐风) */
+:root, [data-theme="akari"] {
+  --header-bg: linear-gradient(135deg, #7C4D38, #5A3525);
+  --card-bg: #FFFFFF;
+  --card-border: #EAE0D0;
+  --body-bg: #FAF6EE;
+  --text-primary: #382314;
+  --text-body: #544030;
+  --text-secondary: #968270;
+  --btn-bg: #C86235;
+  --btn-shadow: #9E461E;
+  --cover-bg: linear-gradient(135deg, #FBF4EA, #EFE2D0);
+  --code-bg: #2B221E;
 }
 
-/* 2. 落樱和风 (Sakura Sweet) */
+/* 2. 复古报刊 (Parchment Retro - 经典复古羊皮纸与墨绿印版) */
+[data-theme="vintage"] {
+  --header-bg: linear-gradient(135deg, #324336, #1E2E22);
+  --card-bg: #FAF6ED;
+  --card-border: #DFD4BE;
+  --body-bg: #F3EDE0;
+  --text-primary: #261C14;
+  --text-body: #48392C;
+  --text-secondary: #8A7866;
+  --btn-bg: #8A4E2A;
+  --btn-shadow: #6E391A;
+  --cover-bg: linear-gradient(135deg, #EBE1CE, #DFD1B8);
+  --code-bg: #22201D;
+}
+
+/* 3. 暖木中古 (Caramel Antique - 焦糖暖栗秋日手账) */
+[data-theme="caramel"] {
+  --header-bg: linear-gradient(135deg, #8C5828, #663C16);
+  --card-bg: #FFFDF8;
+  --card-border: #E8DAC2;
+  --body-bg: #FAF4EB;
+  --text-primary: #452A14;
+  --text-body: #5E4028;
+  --text-secondary: #997C63;
+  --btn-bg: #D47833;
+  --btn-shadow: #AD5B1F;
+  --cover-bg: linear-gradient(135deg, #F8EFE0, #EADBC5);
+  --code-bg: #261F1A;
+}
+
+/* 4. 森系温润 (Forest Warm - 自然青翠纸感) */
+[data-theme="forest"] {
+  --header-bg: linear-gradient(135deg, #5C8D67, #416B4A);
+  --card-bg: #FFFFFF;
+  --card-border: #E0E6D8;
+  --body-bg: #F7F8F3;
+  --text-primary: #2D3B2F;
+  --text-body: #445447;
+  --text-secondary: #7E9182;
+  --btn-bg: #4A855A;
+  --btn-shadow: #336341;
+  --cover-bg: linear-gradient(135deg, #EBF2EA, #DAE6D8);
+  --code-bg: #222923;
+}
+
+/* 5. 落樱和风 (Sakura Sweet) */
 [data-theme="sakura"] {
-  --header-bg: linear-gradient(135deg, #F8A6B2, #E87A90);
+  --header-bg: linear-gradient(135deg, #E88E9B, #D46F80);
   --card-bg: #FFF5F7;
-  --card-border: #FAD1D8;
+  --card-border: #FAD9E0;
   --body-bg: #FFF0F3;
-  --text-primary: #6B3340;
-  --text-body: #7D4E5B;
-  --text-secondary: #B5838E;
-  --btn-bg: #E87A90;
-  --btn-shadow: #C4576D;
+  --text-primary: #5C2834;
+  --text-body: #733F4C;
+  --text-secondary: #AD7986;
+  --btn-bg: #E26D82;
+  --btn-shadow: #B84A5E;
   --cover-bg: linear-gradient(135deg, #FFE5EC, #FFD1DC);
   --code-bg: #2E2528;
 }
 
-/* 3. 宇治抹茶 (Matcha Zen) */
+/* 6. 宇治抹茶 (Matcha Zen) */
 [data-theme="matcha"] {
-  --header-bg: linear-gradient(135deg, #7A9D54, #557A46);
+  --header-bg: linear-gradient(135deg, #749550, #527333);
   --card-bg: #F4F7EE;
-  --card-border: #DDE5D0;
+  --card-border: #DFE6D5;
   --body-bg: #EAF0E2;
-  --text-primary: #344C2B;
-  --text-body: #49633F;
-  --text-secondary: #7F9975;
-  --btn-bg: #557A46;
-  --btn-shadow: #3D5832;
+  --text-primary: #334725;
+  --text-body: #4A613A;
+  --text-secondary: #7C946B;
+  --btn-bg: #5E823C;
+  --btn-shadow: #436125;
   --cover-bg: linear-gradient(135deg, #E0EBD4, #CDE0BC);
   --code-bg: #232B20;
 }
 
-/* 4. 星野深蓝 (Starry Ocean) */
+/* 7. 星野深蓝 (Starry Ocean) */
 [data-theme="ocean"] {
   --header-bg: linear-gradient(135deg, #4A709C, #2E4B72);
   --card-bg: #F0F4F8;
@@ -71,7 +116,7 @@ export const forestThemeCss = `
   --code-bg: #1E2734;
 }
 
-/* 5. Geist 极简极客 (Geist Monochrome) */
+/* 8. Geist 极简极客 (Geist Monochrome) */
 [data-theme="geek"] {
   --header-bg: linear-gradient(135deg, #24292E, #141618);
   --card-bg: #FFFFFF;
@@ -86,7 +131,7 @@ export const forestThemeCss = `
   --code-bg: #1B1F23;
 }
 
-/* 6. 赛博深邃暗夜 (Cyber Dark) */
+/* 9. 赛博深邃暗夜 (Cyber Dark) */
 [data-theme="cyber"] {
   --header-bg: linear-gradient(135deg, #1F2430, #13161F);
   --card-bg: #1B1E28;
@@ -336,13 +381,13 @@ header::after {
   border-radius: 20px;
   padding: 24px;
   width: 90%;
-  max-width: 440px;
+  max-width: 520px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 .theme-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
   margin-top: 16px;
 }
 .theme-option-btn {

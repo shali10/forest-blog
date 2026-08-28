@@ -4,7 +4,7 @@
 
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shali10/forest-blog)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
-[![Release](https://img.shields.io/badge/Release-v1.1.0-blue.svg)](CHANGELOG.md)
+[![Release](https://img.shields.io/badge/Release-v1.2.0-blue.svg)](CHANGELOG.md)
 [![Cloudflare Workers](https://img.shields.io/badge/Platform-Cloudflare%20Workers-orange.svg)](https://workers.cloudflare.com/)
 [![Hono](https://img.shields.io/badge/Framework-Hono%20v4-E36002.svg)](https://hono.dev/)
 [![Database](https://img.shields.io/badge/Database-Cloudflare%20D1%20(FTS5)-blue.svg)](https://developers.cloudflare.com/d1/)
@@ -12,7 +12,7 @@
 
 [English](README.en.md) · **简体中文**
 
-兼具静态博客的 **零维护、零服务器月租、全球 CDN 边缘毫秒直出**，与动态博客的 **在线后台管理、实时发布、6套精选主题即时换肤、FTS5 全文检索、灵动名言金句与一键分享** 能力。
+兼具静态博客的 **零维护、零服务器月租、全球 CDN 边缘毫秒直出**，与动态博客的 **在线后台管理、实时发布、9套精选复古与现代主题即时换肤、FTS5 全文检索、灵动名言金句与一键分享** 能力。
 
 🔗 **线上演示 DEMO**：[https://note.0000996.xyz](https://note.0000996.xyz)
 
@@ -69,8 +69,8 @@
 > 温润纸质质感，清晰的统计卡片、分类导航、精选标签、友情链接与置顶标识。
 ![首页预览](docs/images/preview-home.png)
 
-### 2. 🎨 6 套精选主题调色盘 · 实时一键换肤
-> 点击右上角 `🎨 配色` 随时切换：**森系温润、落樱和风、宇治抹茶、星野深蓝、Geist 极客、赛博深夜**。偏好本地持久化记忆，支持跟随系统深色偏好，首屏零闪烁。
+### 2. 🎨 9 套精选复古与现代主题 · 实时一键换肤
+> 点击右上角 `🎨 配色` 随时切换：**晚灯手记 (Akari Vintage · 默认)、复古报刊 (Parchment Retro)、暖木中古 (Caramel Antique)、森系温润、落樱和风、宇治抹茶、星野深蓝、Geist 极客、赛博深夜**。偏好本地持久化记忆，支持跟随系统深色偏好，首屏零闪烁。
 ![主题切换预览](docs/images/preview-theme-switcher.png)
 
 ### 3. 📖 沉浸式长文阅读 · 目录 TOC 与精调排版
@@ -88,7 +88,7 @@
 | 模块 | 特性亮点 |
 | :--- | :--- |
 | **⚡ 边缘渲染 (Edge SSR)** | Cloudflare Workers 全球 300+ 边缘节点直出 HTML，首屏 TTFB < 45ms，SEO 极佳。 |
-| **🎨 6套精调主题** | 内置森系、落樱、抹茶、深蓝、Geist 极客、赛博深夜，支持实时无刷切换与系统深色自适应。 |
+| **🎨 9套精调主题** | 内置晚灯手记 (致敬 Akari 温暖手帐)、复古报刊、暖木中古、森系、落樱、抹茶、深蓝、Geist 极客、赛博深夜，支持实时无刷切换与系统深色自适应。 |
 | **🔍 全文即时检索** | 基于 SQLite FTS5 全文索引 + LIKE 混合双模引擎，支持 `Ctrl + K` 快捷键瞬间调出搜索弹窗。 |
 | **📝 开箱即用后台** | 访问 `/admin/` 即可管理文章、分类、友链与全站配置，内置 Markdown 工具栏与置顶/草稿开关。 |
 | **💬 灵动名言金句** | 顶栏集成精选文学/哲思名言库，支持点击/刷新即时呼吸切换，充满数字花园人文气息。 |
