@@ -62,14 +62,15 @@ export function renderMarkdown(markdownText: string): MarkdownRenderResult {
 
   // 自定义代码块渲染（支持语言徽章与复制属性）
   renderer.code = function ({ text, lang }) {
-    const language = lang || 'text';
+    const language = (lang || 'text').trim();
+    const displayLang = language.toUpperCase();
     const escapedCode = escapeHtml(text);
-    return `<div class="code-block" data-lang="${language}">
+    return `<div class="code-block" data-lang="${escapeHtml(language)}">
       <div class="code-header">
-        <span class="code-lang">${language}</span>
+        <span class="code-lang"><span class="code-lang-dot"></span>${escapeHtml(displayLang)}</span>
         <button class="copy-btn" onclick="navigator.clipboard.writeText(decodeURIComponent('${encodeURIComponent(text)}')).then(()=>{this.textContent='已复制!';setTimeout(()=>this.textContent='复制',2000)})">复制</button>
       </div>
-      <pre><code class="language-${language}">${escapedCode}</code></pre>
+      <pre><code class="language-${escapeHtml(language)}">${escapedCode}</code></pre>
     </div>`;
   };
 

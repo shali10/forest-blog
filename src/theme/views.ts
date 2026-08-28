@@ -22,6 +22,7 @@ interface BaseLayoutProps {
   url?: string;
   type?: string;
   hideQuote?: boolean;
+  jsonLd?: string;
   content: string;
 }
 
@@ -58,6 +59,7 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
 
   <link rel="alternate" type="application/rss+xml" title="${escapeHtml(props.settings.site_title)}" href="/rss.xml">
   <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
+  ${props.jsonLd ? `<script type="application/ld+json">${props.jsonLd}</script>` : ''}
   
   <!-- 零闪烁多主题初始化脚本 (支持系统深色偏好智能自适应) -->
   <script>
@@ -147,7 +149,7 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
         <a href="https://github.com/shali10/forest-blog" target="_blank" rel="noopener" class="footer-pill" title="GitHub 开源仓库">
           <span style="font-size:1.1em;">🐱</span>
           <span>GitHub</span>
-          <span style="font-size:0.75em;opacity:0.75;background:rgba(0,0,0,0.06);padding:1px 6px;border-radius:10px;">v1.2.0</span>
+          <span style="font-size:0.75em;opacity:0.75;background:rgba(0,0,0,0.06);padding:1px 6px;border-radius:10px;">v1.3.0</span>
         </a>
         <a href="/rss.xml" class="footer-pill" title="RSS 订阅源">
           <span>📡 RSS 订阅</span>
@@ -357,18 +359,33 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
       closeThemeModal();
     }
 
-    // 搜索弹窗逻辑
+    // 搜索弹窗逻辑与键盘上下键导航
     const modal = document.getElementById('search-modal');
     const searchInput = document.getElementById('search-input');
     const searchResults = document.getElementById('search-results');
     let searchDebounce = null;
+    let searchSelectedIndex = -1;
+
+    function updateSearchSelection() {
+      const items = searchResults.querySelectorAll('.search-result-item');
+      items.forEach((it, idx) => {
+        if (idx === searchSelectedIndex) {
+          it.classList.add('selected');
+          it.scrollIntoView({ block: 'nearest' });
+        } else {
+          it.classList.remove('selected');
+        }
+      });
+    }
 
     function openSearch() {
       modal.classList.add('open');
+      searchSelectedIndex = -1;
       setTimeout(() => searchInput.focus(), 50);
     }
     function closeSearch() {
       modal.classList.remove('open');
+      searchSelectedIndex = -1;
     }
 
     document.addEventListener('keydown', (e) => {
@@ -381,13 +398,35 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
         if (document.getElementById('theme-modal').classList.contains('open')) closeThemeModal();
         closeLightbox();
       }
+      if (modal.classList.contains('open')) {
+        const items = searchResults.querySelectorAll('.search-result-item');
+        if (items.length > 0) {
+          if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            searchSelectedIndex = (searchSelectedIndex + 1) % items.length;
+            updateSearchSelection();
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            searchSelectedIndex = (searchSelectedIndex - 1 + items.length) % items.length;
+            updateSearchSelection();
+          } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (searchSelectedIndex >= 0 && searchSelectedIndex < items.length) {
+              items[searchSelectedIndex].click();
+            } else if (items.length > 0) {
+              items[0].click();
+            }
+          }
+        }
+      }
     });
 
     searchInput.addEventListener('input', (e) => {
       clearTimeout(searchDebounce);
+      searchSelectedIndex = -1;
       const q = e.target.value.trim();
       if (!q) {
-        searchResults.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--text-secondary);font-size:0.95em;">请输入搜索关键词</div>';
+        searchResults.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--text-secondary);font-size:0.95em;">请输入搜索关键词 (支持 ↑ ↓ 切换，Enter 跳转)</div>';
         return;
       }
       searchDebounce = setTimeout(async () => {
@@ -400,10 +439,10 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
           }
           searchResults.innerHTML = items.map(it => \`
             <a href="/p/\${it.slug}" class="search-result-item">
-              <div class="search-result-title">\${escapeHtml(it.title)}</div>
-              <div class="search-result-snippet">\${it.snippet || it.excerpt || ''}</div>
+              <div class="search-result-title">\${escapeHtml(it.title)}</div>\${it.snippet || it.excerpt ? \`<div class="search-result-snippet">\${it.snippet || it.excerpt}</div>\` : ''}
             </a>
           \`).join('');
+          searchSelectedIndex = -1;
         } catch(err) {
           searchResults.innerHTML = '<div style="padding:1rem;text-align:center;color:#E87A5D;">检索失败</div>';
         }
@@ -433,6 +472,35 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
       // 运行 Prism 语法着色
       if (window.Prism) {
         Prism.highlightAll();
+      }
+
+      // 目录 TOC 滚动高亮与平滑跟随 (ScrollSpy)
+      const tocLinks = Array.from(document.querySelectorAll('.toc-card a'));
+      const headings = Array.from(document.querySelectorAll('.article-body h2, .article-body h3, .article-body h4'));
+      if (tocLinks.length > 0 && headings.length > 0) {
+        let activeHeadingId = '';
+        const onTocScroll = () => {
+          const scrollPos = (window.scrollY || document.documentElement.scrollTop) + 120;
+          for (let i = headings.length - 1; i >= 0; i--) {
+            if (headings[i].offsetTop <= scrollPos) {
+              activeHeadingId = headings[i].id;
+              break;
+            }
+          }
+          if (!activeHeadingId && headings.length > 0) {
+            activeHeadingId = headings[0].id;
+          }
+          tocLinks.forEach(link => {
+            const href = link.getAttribute('href');
+            if (href === '#' + activeHeadingId) {
+              link.classList.add('active');
+            } else {
+              link.classList.remove('active');
+            }
+          });
+        };
+        window.addEventListener('scroll', onTocScroll, { passive: true });
+        setTimeout(onTocScroll, 100);
       }
     });
 
@@ -644,6 +712,9 @@ export function renderPostView(props: {
   tags: Tag[];
   links: Link[];
   stats: { post_count: number; category_count: number; tag_count: number };
+  prevPost?: { title: string; slug: string } | null;
+  nextPost?: { title: string; slug: string } | null;
+  baseUrl?: string;
 }): string {
   const dateStr = props.post.created_at.slice(0, 10);
 
@@ -668,6 +739,33 @@ export function renderPostView(props: {
     </div>
   ` : '';
 
+  const postNavHtml = (props.prevPost || props.nextPost) ? `
+    <div class="post-nav-grid">
+      ${props.prevPost ? `
+        <a href="/p/${props.prevPost.slug}" class="post-nav-card post-nav-prev">
+          <span class="nav-direction">← 上一篇手记</span>
+          <span class="nav-title">${escapeHtml(props.prevPost.title)}</span>
+        </a>
+      ` : `
+        <div class="post-nav-card post-nav-empty">
+          <span class="nav-direction">← 上一篇手记</span>
+          <span class="nav-title">已经是第一篇啦</span>
+        </div>
+      `}
+      ${props.nextPost ? `
+        <a href="/p/${props.nextPost.slug}" class="post-nav-card post-nav-next">
+          <span class="nav-direction">下一篇手记 →</span>
+          <span class="nav-title">${escapeHtml(props.nextPost.title)}</span>
+        </a>
+      ` : `
+        <div class="post-nav-card post-nav-empty">
+          <span class="nav-direction">下一篇手记 →</span>
+          <span class="nav-title">最新一篇就是它</span>
+        </div>
+      `}
+    </div>
+  ` : '';
+
   const mainArticleCol = `
     <div style="flex:1;min-width:0;">
       <div class="article-container" style="position:relative;">
@@ -689,7 +787,7 @@ export function renderPostView(props: {
           ${props.htmlContent}
         </div>
 
-        <div style="margin-top:35px;padding-top:20px;border-top:2px dashed var(--card-border);display:flex;justify-content:space-between;align-items:center;">
+        <div style="margin-top:35px;padding-top:20px;border-top:2px dashed var(--card-border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
           <div class="tag-cloud">
             ${props.post.tags.split(',').filter(Boolean).map((t, i) => `
               <span class="tag-badge" style="background:${TAG_COLORS[i % TAG_COLORS.length]};">
@@ -699,9 +797,37 @@ export function renderPostView(props: {
           </div>
           <a href="/" class="read-more-btn">← 返回首页</a>
         </div>
+
+        ${postNavHtml}
       </div>
     </div>
   `;
+
+  const jsonLd = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": props.post.title,
+    "description": props.post.excerpt || props.post.title,
+    "datePublished": props.post.created_at,
+    "dateModified": props.post.updated_at || props.post.created_at,
+    "author": {
+      "@type": "Person",
+      "name": props.settings.site_author
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": props.settings.site_title,
+      "logo": {
+        "@type": "ImageObject",
+        "url": props.settings.site_avatar || `${props.baseUrl || ''}/favicon.ico`
+      }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `${props.baseUrl || ''}/p/${props.post.slug}`
+    },
+    "wordCount": props.wordCount
+  });
 
   return renderBaseLayout({
     settings: props.settings,
@@ -709,6 +835,7 @@ export function renderPostView(props: {
     description: props.post.excerpt,
     type: 'article',
     hideQuote: true,
+    jsonLd,
     content: leftSidebar + mainArticleCol
   });
 }

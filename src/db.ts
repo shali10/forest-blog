@@ -308,6 +308,31 @@ export async function getStats(env: Env): Promise<{
   };
 }
 
+// 获取相邻文章 (上一篇 / 下一篇)
+export async function getAdjacentPosts(
+  env: Env,
+  createdAt: string,
+  id: number
+): Promise<{ prev: { title: string; slug: string } | null; next: { title: string; slug: string } | null }> {
+  const prevQuery = `
+    SELECT title, slug FROM posts 
+    WHERE status = 'published' AND (created_at < ? OR (created_at = ? AND id < ?))
+    ORDER BY created_at DESC, id DESC LIMIT 1
+  `;
+  const nextQuery = `
+    SELECT title, slug FROM posts 
+    WHERE status = 'published' AND (created_at > ? OR (created_at = ? AND id > ?))
+    ORDER BY created_at ASC, id ASC LIMIT 1
+  `;
+
+  const [prev, next] = await Promise.all([
+    env.DB.prepare(prevQuery).bind(createdAt, createdAt, id).first<{ title: string; slug: string }>(),
+    env.DB.prepare(nextQuery).bind(createdAt, createdAt, id).first<{ title: string; slug: string }>()
+  ]);
+
+  return { prev: prev || null, next: next || null };
+}
+
 // 获取友链
 export async function listLinks(env: Env): Promise<Link[]> {
   const { results } = await env.DB.prepare(

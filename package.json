@@ -1,6 +1,6 @@
 {
   "name": "forest-blog",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Next-Gen Serverless Edge Blog powered by Cloudflare Workers, D1, R2 and Hono",
   "main": "src/index.ts",
   "type": "module",

@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { Env } from './types';
-import { getSettings, listPosts, getPost, listCategories, listTags, listLinks, getStats } from './db';
+import { getSettings, listPosts, getPost, getAdjacentPosts, listCategories, listTags, listLinks, getStats } from './db';
 import { renderMarkdown } from './markdown';
 import { 
   renderHomeView, renderPostView, renderArchivesView, 
@@ -107,7 +107,13 @@ const handlePostDetail = async (c: any) => {
     return c.html(render404View(settings), 404);
   }
 
-  const { html, toc, wordCount, readTimeMin } = renderMarkdown(post.content);
+  const [adjacent, mdResult] = await Promise.all([
+    getAdjacentPosts(c.env, post.created_at, post.id),
+    Promise.resolve(renderMarkdown(post.content))
+  ]);
+
+  const { html, toc, wordCount, readTimeMin } = mdResult;
+  const baseUrl = new URL(c.req.url).origin;
 
   const pageHtml = renderPostView({
     settings,
@@ -119,7 +125,10 @@ const handlePostDetail = async (c: any) => {
     categories,
     tags,
     links,
-    stats
+    stats,
+    prevPost: adjacent.prev,
+    nextPost: adjacent.next,
+    baseUrl
   });
 
   return c.html(pageHtml);
