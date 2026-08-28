@@ -149,10 +149,10 @@ app.get('/links', async (c) => {
     getSettings(c.env),
     listCategories(c.env),
     listTags(c.env),
+    listLinks(c.env),
     getStats(c.env)
   ]);
-  const currentLinks = await listLinks(c.env);
-  const html = renderLinksView({ settings, links: currentLinks, categories, tags, stats });
+  const html = renderLinksView({ settings, links, categories, tags, stats });
   return c.html(html);
 });
 
