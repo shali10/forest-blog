@@ -37,16 +37,11 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
   <link rel="alternate" type="application/rss+xml" title="${escapeHtml(props.settings.site_title)}" href="/rss.xml">
   <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
   
-  <!-- 零闪烁暗黑模式脚本 -->
+  <!-- 零闪烁多主题初始化脚本 -->
   <script>
     (function() {
-      const stored = localStorage.getItem('forest-theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (stored === 'dark' || (!stored && prefersDark)) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-      } else {
-        document.documentElement.removeAttribute('data-theme');
-      }
+      const stored = localStorage.getItem('forest-theme-name') || 'forest';
+      document.documentElement.setAttribute('data-theme', stored);
     })();
   </script>
   
@@ -66,8 +61,8 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
       <button class="search-trigger-btn" onclick="openSearch()" title="搜索 (Ctrl+K)">
         🔍 搜索
       </button>
-      <button class="theme-btn" onclick="toggleTheme()" title="切换主题">
-        🌓 主题
+      <button class="theme-btn" onclick="openThemeModal()" title="切换主题配色">
+        🎨 配色
       </button>
     </div>
     <h1><a href="/">${escapeHtml(props.settings.site_title)}</a></h1>
@@ -83,6 +78,44 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
   <footer>
     <p>© ${new Date().getFullYear()} <a href="/">${escapeHtml(props.settings.site_title)}</a> · Powered by Cloudflare Workers + D1 · <a href="/rss.xml">RSS</a></p>
   </footer>
+
+  <!-- 多主题配色切换弹窗 -->
+  <div id="theme-modal" class="theme-modal" onclick="if(event.target===this)closeThemeModal()">
+    <div class="theme-modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <h3 style="font-size:1.2em;color:var(--text-primary);font-weight:800;">🎨 选择精选主题配色</h3>
+        <button style="background:transparent;border:none;font-size:1.2em;cursor:pointer;color:var(--text-secondary);" onclick="closeThemeModal()">✕</button>
+      </div>
+      <p style="font-size:0.85em;color:var(--text-secondary);margin-bottom:12px;">实时切换，自动保存到本地偏好</p>
+      
+      <div class="theme-grid">
+        <button class="theme-option-btn" onclick="selectTheme('forest')">
+          <span class="theme-dot" style="background:#7DC395;"></span>
+          <span>🌿 森系温润</span>
+        </button>
+        <button class="theme-option-btn" onclick="selectTheme('sakura')">
+          <span class="theme-dot" style="background:#F8A6B2;"></span>
+          <span>🌸 落樱和风</span>
+        </button>
+        <button class="theme-option-btn" onclick="selectTheme('matcha')">
+          <span class="theme-dot" style="background:#7A9D54;"></span>
+          <span>🍵 宇治抹茶</span>
+        </button>
+        <button class="theme-option-btn" onclick="selectTheme('ocean')">
+          <span class="theme-dot" style="background:#3E78B2;"></span>
+          <span>🌌 星野深蓝</span>
+        </button>
+        <button class="theme-option-btn" onclick="selectTheme('geek')">
+          <span class="theme-dot" style="background:#24292E;"></span>
+          <span>⚡ Geist 极客</span>
+        </button>
+        <button class="theme-option-btn" onclick="selectTheme('cyber')">
+          <span class="theme-dot" style="background:#1B1E28;border-color:#38BDF8;"></span>
+          <span>🌙 赛博深夜</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- FTS5 实时搜索弹窗 -->
   <div id="search-modal" class="modal-backdrop" onclick="if(event.target===this)closeSearch()">
@@ -111,17 +144,20 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
       if (toggle) toggle.classList.toggle('nav-open');
     }
 
-    function toggleTheme() {
-      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-      if (isDark) {
-        document.documentElement.removeAttribute('data-theme');
-        localStorage.setItem('forest-theme', 'light');
-      } else {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        localStorage.setItem('forest-theme', 'dark');
-      }
+    // 主题切换逻辑
+    function openThemeModal() {
+      document.getElementById('theme-modal').classList.add('open');
+    }
+    function closeThemeModal() {
+      document.getElementById('theme-modal').classList.remove('open');
+    }
+    function selectTheme(name) {
+      document.documentElement.setAttribute('data-theme', name);
+      localStorage.setItem('forest-theme-name', name);
+      closeThemeModal();
     }
 
+    // 搜索弹窗逻辑
     const modal = document.getElementById('search-modal');
     const searchInput = document.getElementById('search-input');
     const searchResults = document.getElementById('search-results');
@@ -140,8 +176,9 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
         e.preventDefault();
         modal.classList.contains('open') ? closeSearch() : openSearch();
       }
-      if (e.key === 'Escape' && modal.classList.contains('open')) {
-        closeSearch();
+      if (e.key === 'Escape') {
+        if (modal.classList.contains('open')) closeSearch();
+        if (document.getElementById('theme-modal').classList.contains('open')) closeThemeModal();
       }
     });
 
@@ -180,7 +217,7 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
 </html>`;
 }
 
-// 统一左侧边栏 (完美复刻移动端抽屉与桌面端 Profile Card)
+// 统一左侧边栏 (Profile + Categories + Links + Tags)
 export function renderSidebar(props: {
   settings: SiteSettings;
   categories: Category[];
@@ -215,12 +252,12 @@ export function renderSidebar(props: {
 
         <h4>📁 分类</h4>
         <div class="category-list">
-          <a href="/" style="${!props.currentCategory ? 'border-color:var(--btn-bg);background:#E6F9F6;color:var(--btn-shadow);' : ''}">
+          <a href="/" style="${!props.currentCategory ? 'border-color:var(--btn-bg);background:#FFF;color:var(--btn-shadow);' : ''}">
             <span>全部</span>
             <span style="opacity:0.75;">${props.stats.post_count}</span>
           </a>
           ${props.categories.map(c => `
-            <a href="/?category=${encodeURIComponent(c.slug)}" style="${props.currentCategory === c.slug ? 'border-color:var(--btn-bg);background:#E6F9F6;color:var(--btn-shadow);' : ''}">
+            <a href="/?category=${encodeURIComponent(c.slug)}" style="${props.currentCategory === c.slug ? 'border-color:var(--btn-bg);background:#FFF;color:var(--btn-shadow);' : ''}">
               <span>${escapeHtml(c.name)}</span>
               <span style="opacity:0.75;">${c.post_count || 0}</span>
             </a>

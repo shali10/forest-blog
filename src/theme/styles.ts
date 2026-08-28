@@ -1,12 +1,18 @@
 // ==========================================================
-// 经典温暖手帐风 (Warm Pastel Cream & 3D Cards Theme)
-// 100% 还原并增强移动端抽屉侧边栏与桌面端三栏布局
+// 经典温暖手帐风 + 多主题配色系统 (6 套精调高级主题)
+// 包含：森系温润、落樱和风、极简极客、宇治抹茶、星野深蓝、赛博极夜
 // ==========================================================
 
 export const forestThemeCss = `
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=LXGW+WenKai+Screen:wght@400;700&display=swap');
 
 :root {
+  --font-main: 'LXGW WenKai Screen', 'LXGW WenKai', Nunito, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* 1. 默认：森系手帐 (Forest Warm) */
+:root, [data-theme="forest"] {
   --header-bg: linear-gradient(135deg, #7DC395, #5BAF7A);
   --card-bg: #F7F3DF;
   --card-border: #E8E0CC;
@@ -16,21 +22,77 @@ export const forestThemeCss = `
   --text-secondary: #9F927D;
   --btn-bg: #19C8B9;
   --btn-shadow: #11A89B;
-  
-  --font-main: 'LXGW WenKai Screen', 'LXGW WenKai', Nunito, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --cover-bg: linear-gradient(135deg, #E6F9F6, #D2F2EC);
 }
 
-[data-theme="dark"] {
-  --header-bg: linear-gradient(135deg, #2D523C, #1E3B2A);
-  --card-bg: #222924;
-  --card-border: #323E37;
-  --body-bg: #181D1A;
-  --text-primary: #EAE2D5;
-  --text-body: #CCC4B6;
-  --text-secondary: #8E9C93;
-  --btn-bg: #22A094;
-  --btn-shadow: #156E66;
+/* 2. 落樱和风 (Sakura Sweet) */
+[data-theme="sakura"] {
+  --header-bg: linear-gradient(135deg, #F8A6B2, #E87A90);
+  --card-bg: #FFF5F7;
+  --card-border: #FAD1D8;
+  --body-bg: #FFF0F3;
+  --text-primary: #6B3340;
+  --text-body: #7D4E5B;
+  --text-secondary: #B5838E;
+  --btn-bg: #E87A90;
+  --btn-shadow: #C4576D;
+  --cover-bg: linear-gradient(135deg, #FFE5EC, #FFD1DC);
+}
+
+/* 3. 宇治抹茶 (Matcha Zen) */
+[data-theme="matcha"] {
+  --header-bg: linear-gradient(135deg, #7A9D54, #557A46);
+  --card-bg: #F4F7EE;
+  --card-border: #DDE5D0;
+  --body-bg: #EAF0E2;
+  --text-primary: #344C2B;
+  --text-body: #49633F;
+  --text-secondary: #7F9975;
+  --btn-bg: #557A46;
+  --btn-shadow: #3D5832;
+  --cover-bg: linear-gradient(135deg, #E0EBD4, #CDE0BC);
+}
+
+/* 4. 星野深蓝 (Starry Ocean) */
+[data-theme="ocean"] {
+  --header-bg: linear-gradient(135deg, #4A709C, #2E4B72);
+  --card-bg: #F0F4F8;
+  --card-border: #D0DCE7;
+  --body-bg: #E3EBF3;
+  --text-primary: #1C334E;
+  --text-body: #324B68;
+  --text-secondary: #6B85A3;
+  --btn-bg: #3E78B2;
+  --btn-shadow: #285582;
+  --cover-bg: linear-gradient(135deg, #DCE7F3, #C7D9EC);
+}
+
+/* 5. Geist 极简极客 (Geist Monochrome) */
+[data-theme="geek"] {
+  --header-bg: linear-gradient(135deg, #24292E, #141618);
+  --card-bg: #FFFFFF;
+  --card-border: #E1E4E8;
+  --body-bg: #F6F8FA;
+  --text-primary: #24292E;
+  --text-body: #444D56;
+  --text-secondary: #6A737D;
+  --btn-bg: #0366D6;
+  --btn-shadow: #024EA4;
+  --cover-bg: linear-gradient(135deg, #EAEFF5, #DCE3EB);
+}
+
+/* 6. 赛博深邃暗夜 (Cyber Dark) */
+[data-theme="cyber"] {
+  --header-bg: linear-gradient(135deg, #1F2430, #13161F);
+  --card-bg: #1B1E28;
+  --card-border: #2B3142;
+  --body-bg: #12141C;
+  --text-primary: #E2E8F0;
+  --text-body: #CBD5E1;
+  --text-secondary: #8090A8;
+  --btn-bg: #38BDF8;
+  --btn-shadow: #0284C7;
+  --cover-bg: linear-gradient(135deg, #242938, #181C26);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -42,7 +104,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition: background 0.25s ease, color 0.25s ease;
 }
 button, input, select, textarea { font-family: inherit; }
 a { color: var(--btn-bg); text-decoration: none; transition: all 0.2s; }
@@ -145,6 +207,64 @@ header p {
   transform: translateY(-1px);
 }
 
+/* 多主题切换弹窗/选择器 */
+.theme-modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.theme-modal.open { opacity: 1; pointer-events: auto; }
+.theme-modal-card {
+  background: var(--card-bg);
+  border: 2px solid var(--card-border);
+  border-radius: 20px;
+  padding: 24px;
+  width: 90%;
+  max-width: 440px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+.theme-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+.theme-option-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--body-bg);
+  border: 2px solid var(--card-border);
+  cursor: pointer;
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 0.9em;
+  transition: all 0.2s ease;
+}
+.theme-option-btn:hover, .theme-option-btn.active {
+  border-color: var(--btn-bg);
+  background: #FFF;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+.theme-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 2px solid rgba(0,0,0,0.1);
+}
+
 /* 主内容三栏布局 */
 main {
   max-width: 1360px;
@@ -241,13 +361,10 @@ main {
   transition: all 0.2s ease;
 }
 .category-list a:hover, .link-list a:hover {
-  background: #E6F9F6;
+  background: #FFF;
   border-color: var(--btn-bg);
   color: var(--btn-shadow);
   transform: translateX(3px);
-}
-[data-theme="dark"] .category-list a:hover, [data-theme="dark"] .link-list a:hover {
-  background: #1B2E28;
 }
 
 /* 标签云气泡 */
@@ -293,15 +410,12 @@ main {
 .post-card .post-cover {
   width: 210px;
   flex-shrink: 0;
-  background: linear-gradient(135deg, #E6F9F6, #D2F2EC);
+  background: var(--cover-bg);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 4rem;
   border-right: 2px solid var(--card-border);
-}
-[data-theme="dark"] .post-card .post-cover {
-  background: linear-gradient(135deg, #1C2E27, #16241E);
 }
 .post-card .post-content {
   flex: 1;
