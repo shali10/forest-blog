@@ -132,7 +132,39 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
 
   <!-- 页脚 -->
   <footer>
-    <p>© ${new Date().getFullYear()} <a href="/">${escapeHtml(props.settings.site_title)}</a> · Powered by Cloudflare Workers + D1 · <a href="/rss.xml">RSS</a> · <a href="/sitemap.xml">Sitemap</a></p>
+    <div class="footer-container">
+      <div class="footer-brand-line">
+        <span>🍃 <strong>${escapeHtml(props.settings.site_title)}</strong></span>
+        <span class="footer-dot">·</span>
+        <span>${escapeHtml(props.settings.site_subtitle)}</span>
+      </div>
+
+      <div class="footer-nav-pills">
+        <a href="https://github.com/shali10/forest-blog" target="_blank" rel="noopener" class="footer-pill" title="GitHub 开源仓库">
+          <span style="font-size:1.1em;">🐱</span>
+          <span>GitHub</span>
+          <span style="font-size:0.75em;opacity:0.75;background:rgba(0,0,0,0.06);padding:1px 6px;border-radius:10px;">v1.2.0</span>
+        </a>
+        <a href="/rss.xml" class="footer-pill" title="RSS 订阅源">
+          <span>📡 RSS 订阅</span>
+        </a>
+        <a href="/sitemap.xml" class="footer-pill" title="站点地图">
+          <span>🗺️ 站点地图</span>
+        </a>
+        <a href="https://blog.0000996.xyz" target="_blank" rel="noopener" class="footer-pill" title="Akari 晚灯小屋">
+          <span>🏮 晚灯小屋</span>
+        </a>
+        <a href="javascript:void(0)" onclick="openThemeModal()" class="footer-pill" title="切换主题配色">
+          <span>🎨 配色</span>
+        </a>
+      </div>
+
+      <div class="footer-meta-line">
+        <span>© ${new Date().getFullYear()} ${escapeHtml(props.settings.site_title)}</span>
+        <span class="footer-dot">·</span>
+        <span>Powered by <a href="https://workers.cloudflare.com/" target="_blank" rel="noopener">Cloudflare Workers</a> + <a href="https://developers.cloudflare.com/d1/" target="_blank" rel="noopener">D1</a> + <a href="https://hono.dev/" target="_blank" rel="noopener">Hono</a></span>
+      </div>
+    </div>
   </footer>
 
   <!-- 多主题配色切换弹窗 -->
