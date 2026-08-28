@@ -11,7 +11,7 @@
 
 **English** · [简体中文](README.md)
 
-ForestBlog combines the **zero maintenance, zero monthly server cost, and global edge instant loading (<45ms TTFB)** of static site generators with the **dynamic web admin, real-time publishing, 6 curated theme palettes, FTS5 full-text search, and Giscus community discussions** of dynamic CMS platforms.
+ForestBlog combines the **zero maintenance, zero monthly server cost, and global edge instant loading (<45ms TTFB)** of static site generators with the **dynamic web admin, real-time publishing, 6 curated theme palettes, FTS5 full-text search, dynamic quotes pool, and 1-click sharing** of dynamic CMS platforms.
 
 🔗 **Live Demo**: [https://note.0000996.xyz](https://note.0000996.xyz)
 
@@ -86,7 +86,7 @@ ForestBlog runs entirely within **Cloudflare's generous Free Tier**. You can set
 - **🎨 6 Theme Palettes**: Built-in Forest, Sakura, Matcha, Ocean, Geist, and Cyber themes with system dark mode auto-detection.
 - **🔍 Instant Full-Text Search**: SQLite FTS5 index + LIKE hybrid search triggered instantly via `Ctrl + K`.
 - **📝 Out-of-the-Box Admin**: Manage posts, categories, links, and settings at `/admin/` with Markdown toolbar and 1-click JSON backup export.
-- **💬 Giscus Comments**: Powered by GitHub Discussions, zero spam, and zero server maintenance.
+- **💬 Dynamic Quotes Pool**: Atmospheric literary & philosophical quotes in header with instant click/refresh rotation.
 - **🖼️ Image Lightbox & Code Highlighting**: Click to zoom article images, Prism syntax coloring with 1-click copy.
 - **📱 Fully Responsive**: Custom mobile drawer navigation and floating back-to-top button.
 - **📡 Standard Feeds**: Native RSS 2.0 (`/rss.xml`), Sitemap (`/sitemap.xml`), and OpenGraph social preview tags.

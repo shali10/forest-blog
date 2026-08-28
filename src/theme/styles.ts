@@ -13,7 +13,7 @@ export const forestThemeCss = `
 
 /* 1. 默认：森系手帐 (Forest Warm) */
 :root, [data-theme="forest"] {
-  --header-bg: linear-gradient(135deg, #7DC395, #5BAF7A);
+  --header-bg: linear-gradient(135deg, #6FB987, #4E9F6E);
   --card-bg: #F7F3DF;
   --card-border: #E8E0CC;
   --body-bg: #F8F8F0;
@@ -106,7 +106,7 @@ body {
   font-family: var(--font-main);
   background: var(--body-bg);
   color: var(--text-body);
-  line-height: 1.7;
+  line-height: 1.75;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -121,9 +121,9 @@ a:hover { filter: brightness(0.9); }
   position: fixed;
   top: 0;
   left: 0;
-  height: 3px;
+  height: 3.5px;
   background: var(--btn-bg);
-  z-index: 1005;
+  z-index: 2000;
   width: 0%;
   transition: width 0.1s linear;
   box-shadow: 0 0 10px var(--btn-bg);
@@ -166,38 +166,14 @@ a:hover { filter: brightness(0.9); }
   box-shadow: 0 6px 18px rgba(0,0,0,0.2);
 }
 
-/* 移动端汉堡包抽屉按钮 */
-.mobile-nav-toggle {
-  display: none;
-  position: fixed;
-  top: 14px;
-  left: 14px;
-  z-index: 1004;
-  width: 42px;
-  height: 42px;
-  background: var(--btn-bg);
-  border: none;
-  border-radius: 12px;
-  color: #fff;
-  font-size: 22px;
-  cursor: pointer;
-  box-shadow: 0 3px 0 var(--btn-shadow);
-  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  align-items: center;
-  justify-content: center;
-}
-.mobile-nav-toggle.nav-open {
-  left: 285px !important;
-}
-
 /* 移动端遮罩层 */
 .mobile-overlay {
   display: none;
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(3px);
-  z-index: 999;
+  backdrop-filter: blur(4px);
+  z-index: 1010;
 }
 .mobile-overlay.show {
   display: block;
@@ -207,45 +183,80 @@ a:hover { filter: brightness(0.9); }
 header {
   background: var(--header-bg);
   color: #fff;
-  padding: 45px 20px 40px;
+  padding: 20px 24px 42px;
   text-align: center;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
 }
 header::after {
   content: '';
   position: absolute;
   bottom: 0; left: 0; right: 0;
   height: 35px;
-  background: linear-gradient(transparent, rgba(0,0,0,0.06));
-}
-header h1 {
-  font-size: 2.5em;
-  font-weight: 800;
-  margin-bottom: 8px;
-  letter-spacing: 0.02em;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.12);
-}
-header a { color: #fff; text-decoration: none; }
-header p {
-  opacity: 0.95;
-  font-size: 1.1em;
-  font-weight: 500;
+  background: linear-gradient(transparent, rgba(0,0,0,0.08));
 }
 
-/* 顶栏快捷操作区 */
-.header-actions {
-  position: absolute;
-  top: 16px;
-  right: 20px;
+/* 顶部一体化导航条 (Topbar) */
+.header-topbar {
+  max-width: 1360px;
+  margin: 0 auto 26px;
   display: flex;
-  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
   z-index: 10;
 }
-.theme-btn, .search-trigger-btn {
+.header-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.site-brand-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 50px;
+  font-weight: 800;
+  font-size: 0.9em;
+  backdrop-filter: blur(8px);
+  transition: all 0.2s;
+}
+.site-brand-pill:hover {
+  background: rgba(255, 255, 255, 0.35);
+  transform: translateY(-1px);
+}
+.mobile-nav-btn {
+  display: none;
   background: rgba(255, 255, 255, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #fff;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  font-size: 1.15rem;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  transition: all 0.2s;
+}
+.mobile-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.header-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.theme-btn, .search-trigger-btn {
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   color: #fff;
   padding: 6px 14px;
   border-radius: 50px;
@@ -263,13 +274,54 @@ header p {
   transform: translateY(-1px);
 }
 
+/* 名言金句主展示区 */
+.quote-hero-box {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 10px 16px;
+  position: relative;
+  z-index: 5;
+  cursor: pointer;
+  user-select: none;
+}
+.quote-text {
+  font-size: 2.1em;
+  font-weight: 800;
+  line-height: 1.45;
+  letter-spacing: 0.03em;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  margin-bottom: 12px;
+  display: inline-block;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.quote-author {
+  opacity: 0.92;
+  font-size: 1.05em;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.quote-refresh-hint {
+  font-size: 0.8em;
+  opacity: 0.75;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-left: 6px;
+}
+.quote-hero-box:hover .quote-text {
+  transform: scale(1.015);
+}
+
 /* 多主题切换弹窗 */
 .theme-modal {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0, 0, 0, 0.45);
   backdrop-filter: blur(4px);
-  z-index: 1001;
+  z-index: 1020;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -534,7 +586,7 @@ main {
 }
 
 /* 3D 实体圆角按钮 */
-a.read-more-btn {
+a.read-more-btn, button.share-action-btn {
   display: inline-block;
   padding: 7px 18px;
   background: var(--btn-bg);
@@ -543,15 +595,17 @@ a.read-more-btn {
   border-radius: 50px;
   font-size: 0.82em;
   font-weight: 700;
+  border: none;
+  cursor: pointer;
   box-shadow: 0 3px 0 0 var(--btn-shadow);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
 }
-a.read-more-btn:hover {
+a.read-more-btn:hover, button.share-action-btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 5px 0 0 var(--btn-shadow);
 }
-a.read-more-btn:active {
+a.read-more-btn:active, button.share-action-btn:active {
   transform: translateY(2px);
   box-shadow: 0 1px 0 0 var(--btn-shadow);
 }
@@ -613,6 +667,7 @@ a.read-more-btn:active {
 .article-meta {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 16px;
   font-size: 0.88em;
   font-weight: 700;
@@ -703,6 +758,30 @@ a.read-more-btn:active {
   object-fit: contain;
   border-radius: 10px;
   box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+}
+
+/* Toast 提示框 */
+.forest-toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(30px);
+  background: var(--card-bg);
+  border: 2px solid var(--btn-bg);
+  color: var(--text-primary);
+  padding: 10px 24px;
+  border-radius: 50px;
+  font-weight: 800;
+  font-size: 0.9em;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 2050;
+}
+.forest-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
 
 /* 治愈系引用卡片 */
@@ -844,29 +923,13 @@ a.read-more-btn:active {
 .toc-card li { margin-bottom: 6px; font-weight: 600; font-size: 0.92em; }
 .toc-card .toc-item-3 { padding-left: 16px; font-size: 0.86em; }
 
-/* Giscus 评论区容器 */
-.giscus-wrap {
-  margin-top: 35px;
-  padding-top: 25px;
-  border-top: 2px dashed var(--card-border);
-}
-.giscus-title {
-  font-size: 1.25em;
-  font-weight: 800;
-  color: var(--text-primary);
-  margin-bottom: 18px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
 /* 搜索弹窗 */
 .modal-backdrop {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0, 0, 0, 0.45);
   backdrop-filter: blur(5px);
-  z-index: 1000;
+  z-index: 1020;
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -928,11 +991,16 @@ footer a { color: var(--text-primary); font-weight: 700; }
 }
 
 @media (max-width: 768px) {
-  header { padding: 25px 16px 20px; }
-  header h1 { font-size: 1.8em; }
-  header p { font-size: 0.9em; }
-  .mobile-nav-toggle {
-    display: flex;
+  header { padding: 16px 14px 28px; }
+  .mobile-nav-btn {
+    display: inline-flex;
+  }
+  .quote-text {
+    font-size: 1.45em;
+    margin-bottom: 8px;
+  }
+  .quote-author {
+    font-size: 0.9em;
   }
   main {
     flex-direction: column;
@@ -945,7 +1013,7 @@ footer a { color: var(--text-primary); font-weight: 700; }
     top: 0;
     left: -285px;
     height: 100vh;
-    z-index: 1002;
+    z-index: 1015;
     transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow-y: auto;
     background: var(--body-bg);

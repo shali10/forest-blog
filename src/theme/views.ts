@@ -76,27 +76,41 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
 </head>
 <body>
 
-  <!-- 顶部阅读进度条 -->
+  <!-- 顶部平滑阅读进度条 -->
   <div id="reading-progress-bar"></div>
-
-  <!-- 移动端抽屉开关按钮 -->
-  <button class="mobile-nav-toggle" onclick="toggleNav()" title="菜单">☰</button>
 
   <!-- 移动端抽屉遮罩 -->
   <div class="mobile-overlay" id="mobileOverlay" onclick="toggleNav()"></div>
 
   <!-- 顶部 Header Banner -->
   <header>
-    <div class="header-actions">
-      <button class="search-trigger-btn" onclick="openSearch()" title="搜索 (Ctrl+K)">
-        🔍 搜索
-      </button>
-      <button class="theme-btn" onclick="openThemeModal()" title="切换主题配色">
-        🎨 配色
-      </button>
+    <!-- 一体化顶部导航栏 -->
+    <div class="header-topbar">
+      <div class="header-topbar-left">
+        <button class="mobile-nav-btn" onclick="toggleNav()" title="菜单">☰</button>
+        <a href="/" class="site-brand-pill">
+          <span>🍃</span>
+          <span>${escapeHtml(props.settings.site_title)}</span>
+        </a>
+      </div>
+      <div class="header-topbar-right">
+        <button class="search-trigger-btn" onclick="openSearch()" title="搜索 (Ctrl+K)">
+          🔍 搜索
+        </button>
+        <button class="theme-btn" onclick="openThemeModal()" title="切换主题配色">
+          🎨 配色
+        </button>
+      </div>
     </div>
-    <h1><a href="/">${escapeHtml(props.settings.site_title)}</a></h1>
-    <p>${escapeHtml(props.settings.site_description)}</p>
+
+    <!-- 灵动诗意名言金句展示区 -->
+    <div class="quote-hero-box" onclick="rotateQuote()" title="点击换一句名言">
+      <div id="hero-quote-text" class="quote-text">万物皆有裂痕，那是光照进来的地方</div>
+      <div id="hero-quote-author" class="quote-author">
+        <span>— 莱昂纳德·科恩 (Leonard Cohen)</span>
+        <span class="quote-refresh-hint">✦ 点击换一句</span>
+      </div>
+    </div>
   </header>
 
   <!-- 主体区域 -->
@@ -106,6 +120,9 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
 
   <!-- 悬浮回到顶部按钮 -->
   <button id="backToTopBtn" class="back-to-top-btn" onclick="scrollToTop()" title="回到顶部">↑</button>
+
+  <!-- 全局 Toast 提示 -->
+  <div id="forest-toast" class="forest-toast"></div>
 
   <!-- 页脚 -->
   <footer>
@@ -176,6 +193,45 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
 
   <script>
+    // 精选名言名句库
+    const QUOTES_POOL = [
+      { text: "万物皆有裂痕，那是光照进来的地方", author: "莱昂纳德·科恩" },
+      { text: "心有猛虎，细嗅蔷薇", author: "西格夫里·萨松" },
+      { text: "路漫漫其修远兮，吾将上下而求索", author: "屈原 ·《离骚》" },
+      { text: "星光不问赶路人，时光不负有心人", author: "大冰" },
+      { text: "Stay hungry, stay foolish", author: "Steve Jobs" },
+      { text: "不乱于心，不困于情，不畏将来，不念过往", author: "丰子恺" },
+      { text: "追风赶月莫停留，平芜尽处是春山", author: "田歆" },
+      { text: "人生天地之间，若白驹过隙，忽然而已", author: "庄子 ·《知北游》" },
+      { text: "Talk is cheap. Show me the code.", author: "Linus Torvalds" },
+      { text: "沉舟侧畔千帆过，病树前头万木春", author: "刘禹锡" },
+      { text: "代码是写给人看的，顺便能在机器上运行", author: "Harold Abelson" },
+      { text: "宁静致远，淡泊明志", author: "诸葛亮 ·《诫子书》" }
+    ];
+
+    let currentQuoteIdx = Math.floor(Math.random() * QUOTES_POOL.length);
+
+    function displayQuote(idx) {
+      const q = QUOTES_POOL[idx];
+      const qText = document.getElementById('hero-quote-text');
+      const qAuth = document.getElementById('hero-quote-author');
+      if (!qText || !qAuth) return;
+
+      qText.style.opacity = '0';
+      qText.style.transform = 'translateY(4px)';
+      setTimeout(() => {
+        qText.textContent = q.text;
+        qAuth.innerHTML = '<span>— ' + q.author + '</span><span class=\"quote-refresh-hint\">✦ 点击换一句</span>';
+        qText.style.opacity = '1';
+        qText.style.transform = 'translateY(0)';
+      }, 150);
+    }
+
+    function rotateQuote() {
+      currentQuoteIdx = (currentQuoteIdx + 1) % QUOTES_POOL.length;
+      displayQuote(currentQuoteIdx);
+    }
+
     // 页面滚动监听：进度条 + 回到顶部
     const progressBar = document.getElementById('reading-progress-bar');
     const backToTopBtn = document.getElementById('backToTopBtn');
@@ -200,14 +256,30 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    // Toast 提示
+    function showToast(msg) {
+      const toast = document.getElementById('forest-toast');
+      if (!toast) return;
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2200);
+    }
+
+    // 分享链接复制
+    function copyPageLink() {
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        showToast('🍃 文章链接已复制到剪贴板');
+      }).catch(() => {
+        showToast('复制失败，请手动复制链接');
+      });
+    }
+
     // 移动端抽屉切换
     function toggleNav() {
       const sidebar = document.querySelector('.sidebar');
       const overlay = document.getElementById('mobileOverlay');
-      const toggle = document.querySelector('.mobile-nav-toggle');
       if (sidebar) sidebar.classList.toggle('open');
       if (overlay) overlay.classList.toggle('show');
-      if (toggle) toggle.classList.toggle('nav-open');
     }
 
     // 主题切换逻辑
@@ -221,15 +293,6 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
       document.documentElement.setAttribute('data-theme', name);
       localStorage.setItem('forest-theme-name', name);
       closeThemeModal();
-
-      // 同步更新 Giscus 评论区主题
-      const giscusFrame = document.querySelector('iframe.giscus-frame');
-      if (giscusFrame) {
-        const giscusTheme = (name === 'cyber' || name === 'geek') ? 'dark' : 'light';
-        giscusFrame.contentWindow.postMessage({
-          giscus: { setConfig: { theme: giscusTheme } }
-        }, 'https://giscus.app');
-      }
     }
 
     // 搜索弹窗逻辑
@@ -298,6 +361,8 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      displayQuote(currentQuoteIdx);
+
       // 激活文章内图片点击放大
       document.querySelectorAll('.article-body img').forEach(img => {
         img.addEventListener('click', () => openLightbox(img.src));
@@ -525,29 +590,6 @@ export function renderPostView(props: {
     </div>
   ` : '';
 
-  // Giscus 评论区模块
-  const giscusHtml = props.settings.giscus_repo ? `
-    <div class="giscus-wrap">
-      <div class="giscus-title">💬 交流与讨论</div>
-      <div class="giscus"></div>
-      <script src="https://giscus.app/client.js"
-        data-repo="${escapeHtml(props.settings.giscus_repo)}"
-        data-repo-id="${escapeHtml(props.settings.giscus_repo_id || '')}"
-        data-category="${escapeHtml(props.settings.giscus_category || '')}"
-        data-category-id="${escapeHtml(props.settings.giscus_category_id || '')}"
-        data-mapping="${escapeHtml(props.settings.giscus_mapping || 'pathname')}"
-        data-strict="0"
-        data-reactions-enabled="1"
-        data-emit-metadata="0"
-        data-input-position="top"
-        data-theme="preferred_color_scheme"
-        data-lang="zh-CN"
-        crossorigin="anonymous"
-        async>
-      </script>
-    </div>
-  ` : '';
-
   const mainArticleCol = `
     <div style="flex:1;min-width:0;">
       <div class="article-container">
@@ -558,6 +600,7 @@ export function renderPostView(props: {
             <span>📅 ${dateStr}</span>
             <span>👁️ ${props.post.views} 次浏览</span>
             <span>⏱️ ${props.readTimeMin} 分钟 (${props.wordCount} 字)</span>
+            <button class="share-action-btn" onclick="copyPageLink()" title="复制链接">🔗 分享文章</button>
           </div>
         </header>
 
@@ -577,8 +620,6 @@ export function renderPostView(props: {
           </div>
           <a href="/" class="read-more-btn">← 返回首页</a>
         </div>
-
-        ${giscusHtml}
       </div>
     </div>
   `;

@@ -3,18 +3,14 @@ import { Env, Post, Category, Tag, Link, SiteSettings, Pagination } from './type
 // 获取站点配置
 export async function getSettings(env: Env): Promise<SiteSettings> {
   const defaults: SiteSettings = {
-    site_title: env.SITE_TITLE || '林间随笔',
-    site_subtitle: env.SITE_SUBTITLE || 'Forest Notes',
-    site_description: env.SITE_DESCRIPTION || '静谧森林里的技术札记与生活观察',
+    site_title: env.SITE_TITLE || '林间手记',
+    site_subtitle: env.SITE_SUBTITLE || 'Digital Garden',
+    site_description: env.SITE_DESCRIPTION || '万物皆有裂痕，那是光照进来的地方',
     site_author: env.SITE_AUTHOR || 'root',
     site_avatar: '/assets/avatar.png',
     site_favicon: '/assets/favicon.svg',
     admin_username: env.ADMIN_USERNAME || 'admin',
-    giscus_repo: '',
-    giscus_repo_id: '',
-    giscus_category: '',
-    giscus_category_id: '',
-    giscus_mapping: 'pathname'
+    custom_quote: ''
   };
 
   try {
