@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { Env } from './types';
-import { getSettings, listPosts, getPost, listCategories, listLinks } from './db';
+import { getSettings, listPosts, getPost, listCategories, listTags, listLinks, getStats } from './db';
 import { renderMarkdown } from './markdown';
 import { 
   renderHomeView, renderPostView, renderArchivesView, 
@@ -53,17 +53,25 @@ app.get('/assets/*', async (c) => {
 // 5. 前台 Edge SSR 直出路由
 // ==========================================================
 
-// 首页（支持分页与分类筛选）
+// 首页（支持分页、分类筛选、标签筛选）
 app.get('/', async (c) => {
   const page = Number(c.req.query('page') || 1);
   const categorySlug = c.req.query('category');
-  const settings = await getSettings(c.env);
-  const categories = await listCategories(c.env);
+  const tagName = c.req.query('tag');
+  
+  const [settings, categories, tags, links, stats] = await Promise.all([
+    getSettings(c.env),
+    listCategories(c.env),
+    listTags(c.env),
+    listLinks(c.env),
+    getStats(c.env)
+  ]);
 
   const { posts, pagination } = await listPosts(c.env, {
     page,
     limit: 10,
     categorySlug,
+    tagName,
     status: 'published'
   });
 
@@ -71,8 +79,12 @@ app.get('/', async (c) => {
     settings,
     posts,
     categories,
+    tags,
+    links,
+    stats,
     pagination,
-    currentCategory: categorySlug
+    currentCategory: categorySlug,
+    currentTag: tagName
   });
 
   return c.html(html);
