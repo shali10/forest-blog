@@ -72,8 +72,8 @@ ForestBlog runs entirely within **Cloudflare's generous Free Tier**. You can set
 > Switch themes anytime via the top right `🎨 Theme` button: **Akari Vintage (Default · Warm Cottage), Parchment Retro, Caramel Antique, Forest Warm, Sakura Sweet, Matcha Zen, Starry Ocean, Geist Monochrome, Cyber Dark**. Persistent local memory with zero flicker on first load.
 ![Theme Switcher Preview](docs/images/preview-theme-switcher.png)
 
-### 3. 📖 Immersive Article Reading · TOC, Code Highlights & Giscus
-> Top smooth reading progress bar, syntax-highlighted code blocks with 1-click copy, image lightbox zoom, and Giscus comment integration.
+### 3. 📖 Immersive Article Reading · TOC, Code Highlights & Sharing
+> Top smooth reading progress bar, syntax-highlighted code blocks with 1-click copy, image lightbox zoom, and 1-click link sharing.
 ![Article Preview](docs/images/preview-article.png)
 
 ### 4. 📱 Mobile Responsive · Drawer Navigation

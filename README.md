@@ -74,7 +74,7 @@
 ![主题切换预览](docs/images/preview-theme-switcher.png)
 
 ### 3. 📖 沉浸式长文阅读 · 目录 TOC 与精调排版
-> 顶部平滑阅读进度条、代码高亮一键复制、文章目录智能跳转、图片点击灯箱放大与 Giscus 社区交流。
+> 顶部平滑阅读进度条、代码高亮一键复制、文章目录智能跳转、图片点击灯箱放大与文章一键复制分享。
 ![文章阅读预览](docs/images/preview-article.png)
 
 ### 4. 📱 移动端极致适配 · 丝滑抽屉导航
@@ -176,7 +176,7 @@ forest-blog/
 │   │   └── api.ts           # 公开 REST API、RSS 与 Sitemap
 │   └── theme/
 │       ├── styles.ts        # 6 套调色盘 CSS 变量、进度条与极简样式
-│       └── views.ts         # Edge SSR 页面模板 (首页/文章/归档/友链/Giscus)
+│       └── views.ts         # Edge SSR 页面模板 (首页/文章/归档/友链/404)
 ├── schema.sql               # D1 数据库结构与初始化数据
 ├── wrangler.toml            # Cloudflare Workers 部署配置
 ├── package.json
