@@ -18,7 +18,7 @@ async function run() {
 
   // 1. Home page
   console.log('Navigating to home page...');
-  await page.goto('https://forest.0000996.xyz/', { waitUntil: 'networkidle2' });
+  await page.goto('https://note.0000996.xyz/', { waitUntil: 'networkidle2' });
   await new Promise(r => setTimeout(r, 1000));
   await page.screenshot({ path: path.join(outDir, 'preview-home.png'), fullPage: false });
   console.log('Saved preview-home.png');
@@ -35,7 +35,7 @@ async function run() {
 
   // 3. Article page
   console.log('Navigating to article...');
-  await page.goto('https://forest.0000996.xyz/post/building-serverless-blog-with-cloudflare', { waitUntil: 'networkidle2' });
+  await page.goto('https://note.0000996.xyz/p/hello-forest-blog', { waitUntil: 'networkidle2' });
   await new Promise(r => setTimeout(r, 1000));
   await page.screenshot({ path: path.join(outDir, 'preview-article.png'), fullPage: false });
   console.log('Saved preview-article.png');
@@ -43,7 +43,7 @@ async function run() {
   // 4. Mobile view
   const mobilePage = await browser.newPage();
   await mobilePage.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
-  await mobilePage.goto('https://forest.0000996.xyz/', { waitUntil: 'networkidle2' });
+  await mobilePage.goto('https://note.0000996.xyz/', { waitUntil: 'networkidle2' });
   await new Promise(r => setTimeout(r, 1000));
   await mobilePage.screenshot({ path: path.join(outDir, 'preview-mobile.png'), fullPage: false });
   console.log('Saved preview-mobile.png');
