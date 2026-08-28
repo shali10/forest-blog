@@ -18,8 +18,14 @@ export function renderMarkdown(markdownText: string): MarkdownRenderResult {
     return { html: '', toc: [], wordCount: 0, readTimeMin: 1 };
   }
 
-  // 1. 清理常见扩展锚点语法中的污染，如 "## 标题 {#features}"
-  let cleanMd = markdownText.replace(/\s*\{#[a-zA-Z0-9_-]+\}/g, '');
+  // 1. 自动处理转义换行符（如数据库或 API 导入时携带的字面量 \\n）
+  let cleanMd = markdownText;
+  if (cleanMd.includes('\\n') && !cleanMd.includes('\n')) {
+    cleanMd = cleanMd.replace(/\\r\\n/g, '\n').replace(/\\n/g, '\n');
+  }
+
+  // 2. 清理常见扩展锚点语法中的污染，如 "## 标题 {#features}"
+  cleanMd = cleanMd.replace(/\s*\{#[a-zA-Z0-9_-]+\}/g, '');
 
   // 2. 统计字数与估算阅读时间
   const cleanText = cleanMd.replace(/[#*`~>_[\]()\-+]/g, ' ').replace(/\s+/g, ' ');
