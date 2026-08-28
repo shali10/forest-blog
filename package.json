@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Next-Gen Serverless Edge Blog powered by Cloudflare Workers, D1, R2 and Hono",
   "main": "src/index.ts",
+  "type": "module",
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
@@ -16,6 +17,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260828.1",
+    "puppeteer-core": "^25.9.0",
     "tsx": "^4.23.12",
     "typescript": "^5.7.3",
     "wrangler": "^4.127.0"
