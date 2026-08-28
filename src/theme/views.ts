@@ -164,21 +164,16 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
 </html>`;
 }
 
-// 首页三栏渲染
-export function renderHomeView(props: {
+// 统一左侧边栏生成器 (Profile + Categories + Links + Tags)
+export function renderSidebar(props: {
   settings: SiteSettings;
-  posts: Post[];
   categories: Category[];
   tags: Tag[];
   links: Link[];
   stats: { post_count: number; category_count: number; tag_count: number };
-  pagination: Pagination;
   currentCategory?: string;
-  currentTag?: string;
 }): string {
-
-  // 1. 左侧个人卡片与分类
-  const leftSidebar = `
+  return `
     <aside class="sidebar">
       <div class="profile-card">
         <div class="avatar-box">🌿</div>
@@ -226,10 +221,47 @@ export function renderHomeView(props: {
           </div>
         ` : ''}
       </div>
+
+      <div class="profile-card">
+        <div class="card-section-title" style="margin-top:0;">🏷️ 热门标签</div>
+        <div class="tag-cloud">
+          ${props.tags.map((t, i) => {
+            const color = TAG_COLORS[i % TAG_COLORS.length];
+            return `
+              <a href="/?tag=${encodeURIComponent(t.name)}" class="tag-badge" style="background:${color};">
+                #${escapeHtml(t.name)} (${t.post_count || 1})
+              </a>
+            `;
+          }).join('')}
+        </div>
+      </div>
     </aside>
   `;
+}
 
-  // 2. 中间文章列表
+// 首页三栏渲染
+export function renderHomeView(props: {
+  settings: SiteSettings;
+  posts: Post[];
+  categories: Category[];
+  tags: Tag[];
+  links: Link[];
+  stats: { post_count: number; category_count: number; tag_count: number };
+  pagination: Pagination;
+  currentCategory?: string;
+  currentTag?: string;
+}): string {
+
+  const leftSidebar = renderSidebar({
+    settings: props.settings,
+    categories: props.categories,
+    tags: props.tags,
+    links: props.links,
+    stats: props.stats,
+    currentCategory: props.currentCategory
+  });
+
+  // 中间文章列表
   const postCards = props.posts.length > 0 ? props.posts.map((p, idx) => {
     const dateStr = p.created_at.slice(0, 10);
     const emojis = ['📖', '💡', '🌲', '⚡', '🍂', '☕', '🎨'];
@@ -276,25 +308,14 @@ export function renderHomeView(props: {
     </div>
   `;
 
-  // 3. 右侧标签云与公告
+  // 右侧导航栏
   const rightSidebar = `
     <aside class="sidebar-right">
       <div class="profile-card">
-        <div class="card-section-title" style="margin-top:0;">🏷️ 标签云</div>
-        <div class="tag-cloud">
-          ${props.tags.map((t, i) => {
-            const color = TAG_COLORS[i % TAG_COLORS.length];
-            return `
-              <a href="/?tag=${encodeURIComponent(t.name)}" class="tag-badge" style="background:${color};">
-                #${escapeHtml(t.name)} (${t.post_count || 1})
-              </a>
-            `;
-          }).join('')}
-        </div>
-
-        <div class="card-section-title">📌 快速导航</div>
+        <div class="card-section-title" style="margin-top:0;">📌 快速导航</div>
         <div class="category-list">
           <a href="/archives"><span>📜 全站文章归档</span><span>→</span></a>
+          <a href="/links"><span>🤝 邻里友链</span><span>→</span></a>
           <a href="/rss.xml" target="_blank"><span>📡 RSS 订阅源</span><span>→</span></a>
           <a href="/sitemap.xml" target="_blank"><span>🗺️ 站点地图</span><span>→</span></a>
         </div>
@@ -308,7 +329,7 @@ export function renderHomeView(props: {
   });
 }
 
-// 文章详情页渲染
+// 文章详情页渲染（左侧统一保留 Profile 侧边栏，正文在右侧优雅展开）
 export function renderPostView(props: {
   settings: SiteSettings;
   post: Post;
@@ -316,8 +337,20 @@ export function renderPostView(props: {
   toc: TocItem[];
   wordCount: number;
   readTimeMin: number;
+  categories: Category[];
+  tags: Tag[];
+  links: Link[];
+  stats: { post_count: number; category_count: number; tag_count: number };
 }): string {
   const dateStr = props.post.created_at.slice(0, 10);
+
+  const leftSidebar = renderSidebar({
+    settings: props.settings,
+    categories: props.categories,
+    tags: props.tags,
+    links: props.links,
+    stats: props.stats
+  });
 
   const tocHtml = props.toc.length > 0 ? `
     <div class="toc-card">
@@ -332,8 +365,8 @@ export function renderPostView(props: {
     </div>
   ` : '';
 
-  const content = `
-    <div style="max-width:880px;width:100%;margin:0 auto;">
+  const mainArticleCol = `
+    <div style="flex:1;min-width:0;">
       <div class="article-container">
         <header class="article-header">
           <h1 class="article-title">${escapeHtml(props.post.title)}</h1>
@@ -369,15 +402,27 @@ export function renderPostView(props: {
     settings: props.settings,
     title: props.post.title,
     description: props.post.excerpt,
-    content
+    content: leftSidebar + mainArticleCol
   });
 }
 
-// 归档页
+// 归档页（同样带左侧边栏）
 export function renderArchivesView(props: {
   settings: SiteSettings;
   posts: Post[];
+  categories: Category[];
+  tags: Tag[];
+  links: Link[];
+  stats: { post_count: number; category_count: number; tag_count: number };
 }): string {
+  const leftSidebar = renderSidebar({
+    settings: props.settings,
+    categories: props.categories,
+    tags: props.tags,
+    links: props.links,
+    stats: props.stats
+  });
+
   const groups = new Map<string, Post[]>();
   for (const p of props.posts) {
     const year = p.created_at.slice(0, 4);
@@ -404,8 +449,8 @@ export function renderArchivesView(props: {
     `;
   }
 
-  const content = `
-    <div style="max-width:880px;width:100%;margin:0 auto;">
+  const mainCol = `
+    <div style="flex:1;min-width:0;">
       <div class="article-container">
         <h1 class="article-title" style="margin-bottom:20px;">📜 文章全量归档</h1>
         ${listHtml}
@@ -416,15 +461,26 @@ export function renderArchivesView(props: {
   return renderBaseLayout({
     settings: props.settings,
     title: '文章归档',
-    content
+    content: leftSidebar + mainCol
   });
 }
 
-// 友链页
+// 友链页（带左侧边栏）
 export function renderLinksView(props: {
   settings: SiteSettings;
   links: Link[];
+  categories: Category[];
+  tags: Tag[];
+  stats: { post_count: number; category_count: number; tag_count: number };
 }): string {
+  const leftSidebar = renderSidebar({
+    settings: props.settings,
+    categories: props.categories,
+    tags: props.tags,
+    links: props.links,
+    stats: props.stats
+  });
+
   const linksGrid = `
     <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));gap:16px;margin-top:20px;">
       ${props.links.map(l => `
@@ -436,8 +492,8 @@ export function renderLinksView(props: {
     </div>
   `;
 
-  const content = `
-    <div style="max-width:880px;width:100%;margin:0 auto;">
+  const mainCol = `
+    <div style="flex:1;min-width:0;">
       <div class="article-container">
         <h1 class="article-title">🤝 邻里友链</h1>
         <p style="color:var(--text-secondary);font-weight:600;">常来常往，在数字花园里互联互通。</p>
@@ -449,7 +505,7 @@ export function renderLinksView(props: {
   return renderBaseLayout({
     settings: props.settings,
     title: '友情链接',
-    content
+    content: leftSidebar + mainCol
   });
 }
 

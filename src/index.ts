@@ -93,7 +93,14 @@ app.get('/', async (c) => {
 // 文章详情页 (支持 /p/:slug 与兼容历史 /post/:slug 路由)
 const handlePostDetail = async (c: any) => {
   const slug = c.req.param('slug');
-  const settings = await getSettings(c.env);
+  const [settings, categories, tags, links, stats] = await Promise.all([
+    getSettings(c.env),
+    listCategories(c.env),
+    listTags(c.env),
+    listLinks(c.env),
+    getStats(c.env)
+  ]);
+
   const post = await getPost(c.env, slug, { incViews: true });
 
   if (!post) {
@@ -108,7 +115,11 @@ const handlePostDetail = async (c: any) => {
     htmlContent: html,
     toc,
     wordCount,
-    readTimeMin
+    readTimeMin,
+    categories,
+    tags,
+    links,
+    stats
   });
 
   return c.html(pageHtml);
@@ -120,17 +131,28 @@ app.get('/post/:date/:slug', handlePostDetail); // 兼容原版 6 位日期路�
 
 // 全量归档页
 app.get('/archives', async (c) => {
-  const settings = await getSettings(c.env);
+  const [settings, categories, tags, links, stats] = await Promise.all([
+    getSettings(c.env),
+    listCategories(c.env),
+    listTags(c.env),
+    listLinks(c.env),
+    getStats(c.env)
+  ]);
   const { posts } = await listPosts(c.env, { page: 1, limit: 1000, status: 'published' });
-  const html = renderArchivesView({ settings, posts });
+  const html = renderArchivesView({ settings, posts, categories, tags, links, stats });
   return c.html(html);
 });
 
 // 友链页
 app.get('/links', async (c) => {
-  const settings = await getSettings(c.env);
-  const links = await listLinks(c.env);
-  const html = renderLinksView({ settings, links });
+  const [settings, categories, tags, links, stats] = await Promise.all([
+    getSettings(c.env),
+    listCategories(c.env),
+    listTags(c.env),
+    getStats(c.env)
+  ]);
+  const currentLinks = await listLinks(c.env);
+  const html = renderLinksView({ settings, links: currentLinks, categories, tags, stats });
   return c.html(html);
 });
 
