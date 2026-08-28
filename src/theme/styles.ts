@@ -567,10 +567,13 @@ main {
 }
 .profile-card .bio {
   color: var(--text-body);
-  font-size: 0.85em;
+  font-size: 0.82em;
   text-align: center;
-  margin-bottom: 14px;
-  line-height: 1.5;
+  margin: 0 auto 14px;
+  max-width: 210px;
+  line-height: 1.6;
+  text-wrap: balance;
+  word-break: break-word;
 }
 .profile-card .stats {
   display: flex;
@@ -733,59 +736,99 @@ main {
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+.post-card-pinned {
+  border-color: color-mix(in srgb, var(--btn-bg) 35%, var(--card-border));
+}
 .post-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 28px rgba(114, 93, 66, 0.16);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(114, 93, 66, 0.14);
   border-color: var(--btn-bg);
 }
 .post-stamp {
   position: absolute;
   top: 14px;
-  right: 18px;
+  right: 16px;
   border: 1.5px dashed var(--btn-bg);
   color: var(--btn-bg);
   padding: 2px 8px;
   border-radius: 6px;
-  font-size: 0.68em;
-  font-weight: 900;
-  letter-spacing: 1.5px;
-  transform: rotate(5deg);
-  opacity: 0.55;
+  font-size: 0.7em;
+  font-weight: 800;
+  letter-spacing: 1px;
+  opacity: 0.7;
   pointer-events: none;
-  text-transform: uppercase;
   transition: all 0.25s ease;
   background: var(--body-bg);
+  z-index: 2;
+}
+.post-stamp.stamp-pinned {
+  border-color: #D95338;
+  color: #D95338;
+  background: color-mix(in srgb, #D95338 10%, var(--card-bg));
+  opacity: 0.92;
 }
 .post-card:hover .post-stamp {
-  opacity: 0.95;
-  transform: rotate(0deg) scale(1.05);
+  opacity: 1;
+  transform: scale(1.03);
 }
 .post-card .post-cover {
-  width: 200px;
+  width: 155px;
+  min-height: 180px;
   flex-shrink: 0;
   background: var(--cover-bg);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 3.8rem;
+  font-size: 3.2rem;
   border-right: 2px solid var(--card-border);
   position: relative;
+  overflow: hidden;
+}
+.post-card .post-cover::before {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border: 1px solid color-mix(in srgb, var(--btn-bg) 24%, transparent);
+  border-radius: 16px;
+  transform: rotate(-6deg);
+  pointer-events: none;
+}
+.post-card .cover-watermark {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -52%);
+  color: color-mix(in srgb, var(--btn-bg) 18%, transparent);
+  font-family: Georgia, 'Noto Serif SC', serif;
+  font-size: 6rem;
+  font-weight: 900;
+  line-height: 1;
+  user-select: none;
+  pointer-events: none;
+}
+.post-card .cover-emoji {
+  position: relative;
+  z-index: 1;
+  display: block;
+  font-size: 3.2rem;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.12));
 }
 .post-card .post-content {
   flex: 1;
-  padding: 22px 24px;
+  padding: 20px 22px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   min-width: 0;
 }
 .post-card h2 {
-  font-size: 1.35em;
-  margin-bottom: 10px;
+  font-size: 1.3em;
+  margin-bottom: 8px;
   color: var(--text-primary);
   font-weight: 800;
-  line-height: 1.4;
-  padding-right: 60px;
+  line-height: 1.45;
+  padding-right: 75px;
+  text-wrap: balance;
+  word-break: break-word;
 }
 .post-card h2 a {
   color: var(--text-primary);
@@ -796,10 +839,14 @@ main {
   color: var(--btn-bg);
 }
 .post-card .excerpt {
-  font-size: 0.9em;
+  font-size: 0.88em;
   color: var(--text-body);
   line-height: 1.65;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .post-card .meta-bar {
   display: flex;
@@ -825,20 +872,37 @@ main {
   border: 1px solid var(--card-border);
   padding: 3px 9px;
   border-radius: 50px;
-  font-size: 0.88em;
+  font-size: 0.86em;
   color: var(--text-body);
 }
 .category-pill {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: linear-gradient(135deg, var(--btn-bg), var(--btn-shadow));
-  color: #fff !important;
+  background: color-mix(in srgb, var(--btn-bg) 14%, var(--card-bg));
+  border: 1px solid color-mix(in srgb, var(--btn-bg) 35%, transparent);
+  color: var(--btn-bg) !important;
   padding: 3px 10px;
   border-radius: 50px;
-  font-size: 0.88em;
+  font-size: 0.86em;
   font-weight: 800;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* 列表末尾贴心提示 */
+.list-end-hint {
+  text-align: center;
+  padding: 20px 0 10px;
+  color: var(--text-secondary);
+  font-size: 0.84em;
+  font-weight: 700;
+}
+.list-end-hint span {
+  display: inline-block;
+  padding: 6px 18px;
+  background: var(--card-bg);
+  border: 1.5px dashed var(--card-border);
+  border-radius: 50px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
 /* 3D 实体圆角按钮 */
@@ -914,11 +978,13 @@ a.read-more-btn:active, button.share-action-btn:active {
   border-bottom: 2px dashed var(--card-border);
 }
 .article-title {
-  font-size: 2.1em;
+  font-size: 1.95em;
   font-weight: 800;
   color: var(--text-primary);
-  line-height: 1.35;
+  line-height: 1.4;
   margin-bottom: 14px;
+  text-wrap: balance;
+  word-break: break-word;
 }
 .article-meta {
   display: flex;
@@ -1339,6 +1405,15 @@ footer a { color: var(--text-primary); font-weight: 700; }
   }
   .quote-author {
     font-size: 0.9em;
+  }
+  .post-card .post-cover {
+    width: 108px;
+  }
+  .post-card .cover-watermark {
+    font-size: 5rem;
+  }
+  .post-card .cover-emoji {
+    font-size: 2.5rem;
   }
   main {
     flex-direction: column;

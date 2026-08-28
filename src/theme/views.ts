@@ -2,15 +2,16 @@ import { Post, Category, Tag, SiteSettings, Pagination, Link } from '../types';
 import { TocItem } from '../markdown';
 import { forestThemeCss } from './styles';
 
-// 预设好看的标签马卡龙背景色
+// 预设好看的手账复古色系（低饱和度，与暮色晚灯及全站大地色系完美融合）
 const TAG_COLORS = [
-  '#F8A6B2', // 樱花粉
-  '#7DC395', // 薄荷绿
-  '#59C2C6', // 湖水青
-  '#F4C95D', // 暖麦黄
-  '#8D7EC8', // 熏衣紫
-  '#E88B68', // 珊瑚橘
-  '#6BA4B8'  // 冰川蓝
+  '#9C5B38', // 焦糖暖栗
+  '#4E7A5A', // 林间苍翠
+  '#4B6B8A', // 暮海黛蓝
+  '#9A7246', // 古铜麦黄
+  '#8A5468', // 烟熏干莓
+  '#637845', // 浅苔抹茶
+  '#8E523A', // 赤陶陶土
+  '#635A7C'  // 暮霭紫砂
 ];
 
 interface BaseLayoutProps {
@@ -20,6 +21,7 @@ interface BaseLayoutProps {
   image?: string;
   url?: string;
   type?: string;
+  hideQuote?: boolean;
   content: string;
 }
 
@@ -107,7 +109,8 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
       </div>
     </div>
 
-    <!-- 灵动诗意名言金句展示区 -->
+    <!-- 灵动诗意名言金句展示区（文章详情页隐藏，首屏留给正文） -->
+    ${props.hideQuote ? '' : `
     <div class="quote-hero-box" onclick="rotateQuote()" title="点击换一句名言">
       <span class="quote-mark quote-mark-left">“</span>
       <div id="hero-quote-text" class="quote-text">万物皆有裂痕，那是光照进来的地方</div>
@@ -117,6 +120,7 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
         <span class="quote-refresh-hint">✦ 点击换一句</span>
       </div>
     </div>
+    `}
   </header>
 
   <!-- 主体区域 -->
@@ -562,13 +566,12 @@ export function renderHomeView(props: {
     const isPinned = p.pinned === 1;
 
     return `
-      <article class="post-card">
-        <span class="post-stamp">${isPinned ? 'FEATURED' : 'NOTE'}</span>
-        <div class="post-cover">${emoji}</div>
+      <article class="post-card ${isPinned ? 'post-card-pinned' : ''}">
+        <span class="post-stamp ${isPinned ? 'stamp-pinned' : ''}">${isPinned ? '📌 精选置顶' : 'NOTE'}</span>
+        <div class="post-cover"><span class="cover-watermark">${escapeHtml(p.title.charAt(0))}</span><span class="cover-emoji">${emoji}</span></div>
         <div class="post-content">
           <div>
             <h2>
-              ${isPinned ? '<span class="pinned-badge">📌 置顶</span>' : ''}
               <a href="/p/${p.slug}">${escapeHtml(p.title)}</a>
             </h2>
             <div class="excerpt">${escapeHtml(p.excerpt || '')}</div>
@@ -597,7 +600,9 @@ export function renderHomeView(props: {
       <span class="current">${props.pagination.page} / ${props.pagination.total_pages}</span>
       ${props.pagination.page < props.pagination.total_pages ? `<a href="/?page=${props.pagination.page + 1}${props.currentCategory ? '&category=' + props.currentCategory : ''}">下一页</a>` : ''}
     </nav>
-  ` : '';
+  ` : (props.posts.length > 0 ? `
+    <div class="list-end-hint"><span>🍃 已经到底啦 · 晚风轻拂数字森林</span></div>
+  ` : '');
 
   const centerCol = `
     <div class="post-list-col">
@@ -703,6 +708,7 @@ export function renderPostView(props: {
     title: props.post.title,
     description: props.post.excerpt,
     type: 'article',
+    hideQuote: true,
     content: leftSidebar + mainArticleCol
   });
 }
