@@ -94,8 +94,8 @@ INSERT OR IGNORE INTO settings (key, value) VALUES
 ('site_title', '林间随笔'),
 ('site_subtitle', 'Forest Notes'),
 ('site_description', '静谧森林里的技术札记与生活观察'),
-('site_author', 'root'),
-('site_avatar', '/assets/avatar.png'),
+('site_author', '你还不睡觉'),
+('site_avatar', 'https://img.0000996.xyz/avatar.png'),
 ('site_favicon', '/assets/favicon.svg'),
 ('admin_username', 'admin');
 
