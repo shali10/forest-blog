@@ -558,7 +558,7 @@ export function renderSidebar(props: {
             <span>全部手记</span>
             <span style="opacity:0.75;">${props.stats.post_count}</span>
           </a>
-          ${props.categories.map(c => `
+          ${props.categories.filter(c => (c.post_count || 0) > 0).map(c => `
             <a href="/?category=${encodeURIComponent(c.slug)}" style="${props.currentCategory === c.slug ? 'border-color:var(--btn-bg);background:#FFF;color:var(--btn-shadow);' : ''}">
               <span>${escapeHtml(c.name)}</span>
               <span style="opacity:0.75;">${c.post_count || 0}</span>
@@ -635,7 +635,7 @@ export function renderHomeView(props: {
 
     return `
       <article class="post-card ${isPinned ? 'post-card-pinned' : ''}">
-        <span class="post-stamp ${isPinned ? 'stamp-pinned' : ''}">${isPinned ? '📌 精选置顶' : 'NOTE'}</span>
+        <span class="post-stamp ${isPinned ? 'stamp-pinned' : ''}">${isPinned ? '📌 精选推荐' : 'NOTE'}</span>
         <div class="post-cover"><span class="cover-watermark">${escapeHtml(p.title.charAt(0))}</span><span class="cover-emoji">${emoji}</span></div>
         <div class="post-content">
           <div>
