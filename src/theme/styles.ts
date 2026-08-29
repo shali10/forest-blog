@@ -1381,8 +1381,8 @@ footer {
 @media (min-width: 769px) {
   .toc-toggle-hint { display: none; }
 }
-.toc-card.is-collapsed ul { display: block; }
 .toc-card ul { list-style: none; padding-left: 0; margin: 0; }
+.toc-card.is-collapsed ul { display: none; }
 .toc-card li { margin-bottom: 6px; font-size: 0.9em; }
 .toc-card .toc-item-3 { padding-left: 16px; font-size: 0.85em; }
 .toc-card .toc-item-4 { padding-left: 28px; font-size: 0.82em; }

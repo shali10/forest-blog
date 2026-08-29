@@ -69,7 +69,7 @@ export function renderMarkdown(markdownText: string): MarkdownRenderResult {
     return `<div class="code-block" data-lang="${escapeHtml(language)}">
       <div class="code-header">
         <span class="code-lang"><span class="code-lang-dot"></span>${escapeHtml(displayLang)}</span>
-        <button type="button" class="copy-btn" aria-label="复制代码" onclick="navigator.clipboard.writeText(decodeURIComponent('${encodeURIComponent(text)}')).then(()=>{this.textContent='已复制!';setTimeout(()=>this.textContent='复制',2000)})">复制</button>
+        <button type="button" class="copy-btn" aria-label="复制代码" onclick="copyCode(this)">复制</button>
       </div>
       <pre><code class="language-${escapeHtml(language)}">${escapedCode}</code></pre>
     </div>`;

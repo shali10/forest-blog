@@ -241,7 +241,7 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
 
   <!-- 图片放大灯箱 Modal -->
   <div id="img-lightbox" class="img-lightbox-modal" onclick="closeLightbox()" role="dialog" aria-modal="true" aria-label="图片预览">
-  <img id="lightbox-img" src="" alt="放大预览">
+  <img id="lightbox-img" alt="放大预览">
   </div>
 
   <!-- 轻量 Prism.js 语法着色 -->
@@ -319,6 +319,19 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
       toast.textContent = msg;
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), 2200);
+    }
+
+    async function copyCode(button) {
+      const code = button.closest('.code-block')?.querySelector('code');
+      if (!code) return;
+      try {
+        await navigator.clipboard.writeText(code.innerText);
+        const original = button.textContent;
+        button.textContent = '已复制!';
+        setTimeout(() => { button.textContent = original || '复制'; }, 2000);
+      } catch (err) {
+        showToast('复制失败，请手动复制代码');
+      }
     }
 
     // 分享链接复制
@@ -487,6 +500,13 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
       }
 
       // 目录 TOC 滚动高亮与平滑跟随 (ScrollSpy)
+      document.querySelectorAll('.toc-card').forEach(toc => {
+        const title = toc.querySelector('.toc-card-title');
+        if (title && !window.matchMedia('(max-width: 768px)').matches) {
+          toc.classList.remove('is-collapsed');
+          title.setAttribute('aria-expanded', 'true');
+        }
+      });
       const tocLinks = Array.from(document.querySelectorAll('.toc-card a'));
       const headings = Array.from(document.querySelectorAll('.article-body h2, .article-body h3, .article-body h4'));
       if (tocLinks.length > 0 && headings.length > 0) {
