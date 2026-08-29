@@ -507,7 +507,7 @@ main {
 /* 左侧栏 & 右侧栏 */
 .sidebar { width: 280px; flex-shrink: 0; display: flex; flex-direction: column; gap: 16px; }
 .sidebar-right { width: 280px; flex-shrink: 0; display: flex; flex-direction: column; gap: 16px; }
-.post-list-col { width: 740px; flex-shrink: 0; display: flex; flex-direction: column; gap: 24px; }
+.post-list-col { width: min(740px, calc(100vw - 648px)); flex-shrink: 1; display: flex; flex-direction: column; gap: 24px; }
 
 /* 治愈系个人资料卡片 (Profile Card) */
 .profile-card {
@@ -1330,6 +1330,30 @@ footer {
   border-bottom: none;
 }
 
+/* 文章快速判断摘要 */
+.article-quick-summary {
+  margin: 0 0 24px;
+  padding: 16px 18px;
+  border: 1.5px solid var(--card-border);
+  border-left: 4px solid var(--btn-bg);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--btn-bg) 6%, var(--card-bg));
+}
+.quick-summary-title {
+  color: var(--text-primary);
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+.quick-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px 16px;
+  color: var(--text-secondary);
+  font-size: 0.88em;
+  line-height: 1.55;
+}
+.quick-summary-grid strong { color: var(--text-primary); }
+
 /* 目录 (TOC) */
 .toc-card {
   background: var(--body-bg);
@@ -1547,6 +1571,7 @@ footer a { color: var(--text-primary); font-weight: 700; }
   .post-card { flex-direction: column; }
   .post-card .post-cover { width: 100%; height: 120px; border-right: none; border-bottom: 2px solid var(--card-border); }
   .article-container { padding: 22px 18px; }
+  .quick-summary-grid { grid-template-columns: 1fr; gap: 6px; }
   .post-nav-grid { grid-template-columns: 1fr; gap: 12px; }
   .post-nav-card.post-nav-next { text-align: left; align-items: flex-start; }
 }

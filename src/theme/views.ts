@@ -587,10 +587,10 @@ export function renderSidebar(props: {
         <div class="sticky-meta">SEASON 08 · 暮色晚灯</div>
       </div>
 
-      <div class="profile-card" style="margin-top:16px;">
-        <h4 style="margin-top:0;margin-bottom:10px;">🏷️ 标签云</h4>
+      <div class="profile-card">
+        <h4 style="margin-top:0;margin-bottom:10px;">🏷️ 精选标签</h4>
         <div class="tag-cloud">
-          ${props.tags.map((t, i) => {
+          ${props.tags.slice(0, 10).map((t, i) => {
             const color = TAG_COLORS[i % TAG_COLORS.length];
             return `
               <a href="/?tag=${encodeURIComponent(t.name)}" class="tag-badge" style="background:${color};">
@@ -780,6 +780,15 @@ export function renderPostView(props: {
             <button class="share-action-btn" onclick="copyPageLink()" title="复制链接">🔗 分享文章</button>
           </div>
         </header>
+
+        <div class="article-quick-summary">
+          <div class="quick-summary-title">🧭 快速判断</div>
+          <div class="quick-summary-grid">
+            <span><strong>适合：</strong>需要实操步骤和验证方法的读者</span>
+            <span><strong>阅读：</strong>${props.readTimeMin} 分钟 · ${props.wordCount} 字</span>
+            <span><strong>重点：</strong>配置、边界与故障排查</span>
+          </div>
+        </div>
 
         ${tocHtml}
 
