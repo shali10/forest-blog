@@ -18,11 +18,12 @@ export function renderMarkdown(markdownText: string): MarkdownRenderResult {
     return { html: '', toc: [], wordCount: 0, readTimeMin: 1 };
   }
 
-  // 1. 自动处理转义换行符（如数据库或 API 导入时携带的字面量 \\n）
-  let cleanMd = markdownText;
-  if (cleanMd.includes('\\n') && !cleanMd.includes('\n')) {
-    cleanMd = cleanMd.replace(/\\r\\n/g, '\n').replace(/\\n/g, '\n');
-  }
+  // 1. 归一化数据库/API 导入留下的字面量换行。只排除已转义
+  // 的 "\\\\n"，避免重复解码；不能因为正文里已有真实换行就跳过。
+  let cleanMd = markdownText.replace(/(?<!\\)\\r\\n/g, '\n').replace(/(?<!\\)\\n/g, '\n');
+
+  // 页面模板已经渲染文章标题，正文开头的 H1 会形成重复标题。
+  cleanMd = cleanMd.replace(/^\uFEFF?\s*#\s+[^\n]+\n+/, '');
 
   // 2. 清理常见扩展锚点语法中的污染，如 "## 标题 {#features}"
   cleanMd = cleanMd.replace(/\s*\{#[a-zA-Z0-9_-]+\}/g, '');

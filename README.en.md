@@ -96,6 +96,8 @@ ForestBlog runs entirely within **Cloudflare's generous Free Tier**. You can set
 
 ## 🚀 Quick Deployment (Choose One)
 
+> **Required production secrets:** set both `ADMIN_PASSWORD` and `JWT_SECRET` with `npx wrangler secret put <NAME>`. The admin API fails closed when either secret is missing; there is no public default password.
+
 ### Option A: Fork & Deploy (Recommended · 1-Click Web Setup)
 
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shali10/forest-blog)

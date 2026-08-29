@@ -14,9 +14,15 @@ adminRouter.post('/login', async (c) => {
   const username = body.username || '';
   const password = body.password || '';
 
-  const expectedUser = c.env.ADMIN_USERNAME || 'admin';
-  const expectedPass = c.env.ADMIN_PASSWORD || 'admin123';
-  const secret = c.env.JWT_SECRET || 'forest-default-secret-key-2026';
+  const expectedUser = c.env.ADMIN_USERNAME || '';
+  const expectedPass = c.env.ADMIN_PASSWORD || '';
+  const secret = c.env.JWT_SECRET || '';
+
+  // Production must fail closed. Publicly known fallback credentials or signing
+  // keys turn a missed secret binding into an admin-account takeover.
+  if (!expectedUser || !expectedPass || !secret) {
+    return c.json({ success: false, error: 'Admin secrets are not configured' }, 503);
+  }
 
   if (username === expectedUser && password === expectedPass) {
     // 7 天有效期
@@ -40,7 +46,10 @@ adminRouter.use('/*', async (c, next) => {
   }
 
   const token = authHeader.slice(7);
-  const secret = c.env.JWT_SECRET || 'forest-default-secret-key-2026';
+  const secret = c.env.JWT_SECRET || '';
+  if (!secret) {
+    return c.json({ error: 'Admin secrets are not configured' }, 503);
+  }
   const result = await verifyToken(token, secret);
 
   if (!result.valid) {

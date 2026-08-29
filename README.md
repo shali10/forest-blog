@@ -149,11 +149,12 @@ npm run db:init:remote
 npm run deploy
 ```
 
-> 💡 **设置管理员强密码**：
+> 💡 **设置后台凭据**：
 > ```bash
 > npx wrangler secret put ADMIN_PASSWORD
-> # 输入自定义管理员密码（默认未设置时密码为 admin123）
+> npx wrangler secret put JWT_SECRET
 > ```
+> `JWT_SECRET` 可用 `openssl rand -hex 32` 生成。当前版本未配置这两个 Secret 时会拒绝后台登录，不提供公开默认密码。
 
 ---
 
