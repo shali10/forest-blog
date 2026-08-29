@@ -91,7 +91,7 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
     <!-- 一体化顶部导航栏 -->
     <div class="header-topbar">
       <div class="header-topbar-left">
-        <button class="mobile-nav-btn" onclick="toggleNav()" title="菜单">☰</button>
+        <button class="mobile-nav-btn" onclick="toggleNav()" title="打开导航菜单" aria-label="打开导航菜单" aria-controls="mobileOverlay" aria-expanded="false">☰</button>
         <a href="/" class="site-brand-pill">
           <span>🍃</span>
           <span>${escapeHtml(props.settings.site_title)}</span>
@@ -102,10 +102,10 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
         </div>
       </div>
       <div class="header-topbar-right">
-        <button class="search-trigger-btn" onclick="openSearch()" title="搜索 (Ctrl+K)">
+        <button class="search-trigger-btn" onclick="openSearch()" title="搜索 (Ctrl+K)" aria-label="搜索文章 (Ctrl+K)">
           🔍 搜索
         </button>
-        <button class="theme-btn" onclick="openThemeModal()" title="切换主题配色">
+        <button class="theme-btn" onclick="openThemeModal()" title="切换主题配色" aria-label="切换主题配色">
           🎨 配色
         </button>
       </div>
@@ -178,7 +178,7 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
     <div class="theme-modal-card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
         <h3 style="font-size:1.2em;color:var(--text-primary);font-weight:800;">🎨 选择精选主题配色</h3>
-        <button style="background:transparent;border:none;font-size:1.2em;cursor:pointer;color:var(--text-secondary);" onclick="closeThemeModal()">✕</button>
+        <button style="background:transparent;border:none;font-size:1.2em;cursor:pointer;color:var(--text-secondary);" onclick="closeThemeModal()" aria-label="关闭主题选择">✕</button>
       </div>
       <p style="font-size:0.85em;color:var(--text-secondary);margin-bottom:12px;">实时切换，自动保存到本地偏好</p>
       
@@ -224,24 +224,24 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
   </div>
 
   <!-- FTS5 实时搜索弹窗 -->
-  <div id="search-modal" class="modal-backdrop" onclick="if(event.target===this)closeSearch()">
+  <div id="search-modal" class="modal-backdrop" onclick="if(event.target===this)closeSearch()" role="dialog" aria-modal="true" aria-label="搜索文章">
     <div class="search-dialog">
       <div class="search-input-box">
         <span>🔍</span>
-        <input type="text" id="search-input" class="search-input" placeholder="输入关键词全文检索..." autocomplete="off">
-        <button style="background:transparent;border:none;font-size:1.2em;cursor:pointer;color:var(--text-secondary);" onclick="closeSearch()">✕</button>
+        <input type="text" id="search-input" class="search-input" placeholder="搜索标题、正文或标签..." aria-label="搜索标题、正文或标签" autocomplete="off">
+        <button style="background:transparent;border:none;font-size:1.2em;cursor:pointer;color:var(--text-secondary);" onclick="closeSearch()" aria-label="关闭搜索">✕</button>
       </div>
-      <div id="search-results" class="search-results">
+      <div id="search-results" class="search-results" aria-live="polite" aria-label="搜索结果">
         <div style="padding:2rem;text-align:center;color:var(--text-secondary);font-size:0.95em;font-weight:600;">
-          支持标题、正文全量检索 (按 ESC 关闭)
+          搜索标题、正文和标签<br><span style="font-size:0.88em;opacity:0.8;">试试：Hermes · Cloudflare · Linux</span>
         </div>
       </div>
     </div>
   </div>
 
   <!-- 图片放大灯箱 Modal -->
-  <div id="img-lightbox" class="img-lightbox-modal" onclick="closeLightbox()">
-    <img id="lightbox-img" src="" alt="Zoomed">
+  <div id="img-lightbox" class="img-lightbox-modal" onclick="closeLightbox()" role="dialog" aria-modal="true" aria-label="图片预览">
+  <img id="lightbox-img" src="" alt="放大预览">
   </div>
 
   <!-- 轻量 Prism.js 语法着色 -->
@@ -334,8 +334,11 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
     function toggleNav() {
       const sidebar = document.querySelector('.sidebar');
       const overlay = document.getElementById('mobileOverlay');
+      const trigger = document.querySelector('.mobile-nav-btn');
+      const opening = sidebar ? !sidebar.classList.contains('open') : false;
       if (sidebar) sidebar.classList.toggle('open');
       if (overlay) overlay.classList.toggle('show');
+      if (trigger) trigger.setAttribute('aria-expanded', String(opening));
     }
 
     // 主题切换逻辑
@@ -388,6 +391,15 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
       searchSelectedIndex = -1;
     }
 
+    function toggleToc(title) {
+      const toc = title.closest('.toc-card');
+      if (!toc) return;
+      const collapsed = toc.classList.toggle('is-collapsed');
+      title.setAttribute('aria-expanded', String(!collapsed));
+      const hint = title.querySelector('.toc-toggle-hint');
+      if (hint) hint.textContent = collapsed ? '展开' : '收起';
+    }
+
     document.addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
@@ -426,7 +438,7 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
       searchSelectedIndex = -1;
       const q = e.target.value.trim();
       if (!q) {
-        searchResults.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--text-secondary);font-size:0.95em;">请输入搜索关键词 (支持 ↑ ↓ 切换，Enter 跳转)</div>';
+        searchResults.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--text-secondary);font-size:0.95em;">搜索标题、正文和标签<br><span style="font-size:0.88em;opacity:0.8;">试试：Hermes · Cloudflare · Linux</span></div>';
         return;
       }
       searchDebounce = setTimeout(async () => {
@@ -727,9 +739,9 @@ export function renderPostView(props: {
   });
 
   const tocHtml = props.toc.length > 0 ? `
-    <div class="toc-card">
-      <div class="toc-card-title">📑 目录导航</div>
-      <ul>
+        <div class="toc-card is-collapsed">
+          <div class="toc-card-title" role="button" tabindex="0" aria-expanded="false" onclick="toggleToc(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleToc(this)}">📑 目录导航 <span class="toc-toggle-hint">展开</span></div>
+          <ul>
         ${props.toc.map(item => `
           <li class="toc-item-${item.level}">
             <a href="#${item.id}">${escapeHtml(item.text)}</a>
@@ -767,7 +779,7 @@ export function renderPostView(props: {
   ` : '';
 
   const mainArticleCol = `
-    <div style="flex:1;min-width:0;">
+    <div class="article-main-col" style="flex:1;min-width:0;">
       <div class="article-container" style="position:relative;">
         <div class="washi-tape"></div>
         <header class="article-header">

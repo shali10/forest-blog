@@ -181,6 +181,11 @@ button, input, select, textarea { font-family: inherit; }
 a { color: var(--btn-bg); text-decoration: none; transition: all 0.2s; }
 a:hover { filter: brightness(0.9); }
 
+button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--btn-bg) 65%, #fff);
+  outline-offset: 3px;
+}
+
 /* 顶部平滑阅读进度条 */
 #reading-progress-bar {
   position: fixed;
@@ -479,7 +484,7 @@ header::after {
 }
 .theme-option-btn:hover, .theme-option-btn.active {
   border-color: var(--btn-bg);
-  background: #FFF;
+  background: var(--card-bg);
   transform: translateY(-2px);
   box-shadow: 0 4px 10px rgba(0,0,0,0.08);
 }
@@ -1181,7 +1186,7 @@ footer {
   box-shadow: 0 2px 5px rgba(0,0,0,0.03);
 }
 .footer-pill:hover {
-  background: #FFF;
+  background: var(--card-bg);
   border-color: var(--btn-bg);
   color: var(--btn-bg) !important;
   transform: translateY(-2px);
@@ -1371,6 +1376,12 @@ footer {
   align-items: center;
   gap: 6px;
 }
+.toc-card-title[role="button"] { cursor: pointer; user-select: none; }
+.toc-toggle-hint { margin-left: auto; font-size: 0.78em; color: var(--text-secondary); font-weight: 600; }
+@media (min-width: 769px) {
+  .toc-toggle-hint { display: none; }
+}
+.toc-card.is-collapsed ul { display: block; }
 .toc-card ul { list-style: none; padding-left: 0; margin: 0; }
 .toc-card li { margin-bottom: 6px; font-size: 0.9em; }
 .toc-card .toc-item-3 { padding-left: 16px; font-size: 0.85em; }
@@ -1570,8 +1581,11 @@ footer a { color: var(--text-primary); font-weight: 700; }
   }
   .post-card { flex-direction: column; }
   .post-card .post-cover { width: 100%; height: 120px; border-right: none; border-bottom: 2px solid var(--card-border); }
+  .post-list-col, .article-main-col { order: -1; }
   .article-container { padding: 22px 18px; }
   .quick-summary-grid { grid-template-columns: 1fr; gap: 6px; }
+  .toc-card.is-collapsed ul { display: none; }
+  .toc-card.is-collapsed .toc-card-title { margin-bottom: 0; }
   .post-nav-grid { grid-template-columns: 1fr; gap: 12px; }
   .post-nav-card.post-nav-next { text-align: left; align-items: flex-start; }
 }
