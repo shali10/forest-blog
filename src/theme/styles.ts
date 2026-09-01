@@ -1,6 +1,6 @@
 // ==========================================================
-// 经典温暖手帐风 + 多主题配色系统 (9 套精调高级主题)
-// 包含：晚灯手记(Akari)、复古报刊、暖木中古、森系温润、落樱和风、宇治抹茶、星野深蓝、极简极客、赛博深夜
+// 经典温暖手帐风 + 多主题配色系统 (10 套精调高级主题)
+// 包含：晚灯手记(Akari)、复古报刊、暖木中古、森系温润、落樱和风、宇治抹茶、星野深蓝、极简极客、赛博深夜、青屿海报
 // ==========================================================
 
 export const forestThemeCss = `
@@ -162,6 +162,23 @@ export const forestThemeCss = `
   --code-bg: #0F131A;
   --dot-color: rgba(56, 189, 248, 0.1);
   --tape-color: rgba(56, 189, 248, 0.25);
+}
+
+/* 10. 青屿海报 (Poster Fresh - 清新高饱和旅行海报插画风) */
+[data-theme="poster"] {
+  --header-bg: linear-gradient(135deg, #1D7A74, #125450);
+  --card-bg: #FFFFFF;
+  --card-border: #CBE3DE;
+  --body-bg: #F2F8F6;
+  --text-primary: #0F3A36;
+  --text-body: #244F4B;
+  --text-secondary: #5E8783;
+  --btn-bg: #FF9F1C;
+  --btn-shadow: #D97706;
+  --cover-bg: linear-gradient(135deg, #E0F2EF, #CEECE7);
+  --code-bg: #112826;
+  --dot-color: rgba(29, 122, 116, 0.08);
+  --tape-color: rgba(255, 159, 28, 0.45);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }

@@ -219,6 +219,10 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
           <span class="theme-dot" style="background:#1B1E28;border-color:#38BDF8;"></span>
           <span>🌙 赛博深夜</span>
         </button>
+        <button class="theme-option-btn" data-theme-id="poster" onclick="selectTheme('poster')">
+          <span class="theme-dot" style="background:#1D7A74;border-color:#FF9F1C;"></span>
+          <span>🏖️ 青屿海报</span>
+        </button>
       </div>
     </div>
   </div>
