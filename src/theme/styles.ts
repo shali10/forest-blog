@@ -1,6 +1,6 @@
 // ==========================================================
-// 经典温暖手帐风 + 多主题配色系统 (10 套精调高级主题)
-// 包含：晚灯手记(Akari)、复古报刊、暖木中古、森系温润、落樱和风、宇治抹茶、星野深蓝、极简极客、赛博深夜、青屿海报
+// 经典温暖手帐风 + 多主题配色系统 (11 套精调高级主题)
+// 包含：晚灯手记(Akari)、复古报刊、暖木中古、森系温润、落樱和风、宇治抹茶、星野深蓝、极简极客、赛博深夜、青屿海报、闲暇时光
 // ==========================================================
 
 export const forestThemeCss = `
@@ -179,6 +179,23 @@ export const forestThemeCss = `
   --code-bg: #112826;
   --dot-color: rgba(29, 122, 116, 0.08);
   --tape-color: rgba(255, 159, 28, 0.45);
+}
+
+/* 11. 闲暇时光 (Chill Time - 灵感源自 ChillTime 的海盐薄荷、落日暖橙与清透白噪音风) */
+[data-theme="chill"] {
+  --header-bg: linear-gradient(135deg, #2EC4B6, #FF9F1C);
+  --card-bg: #FFFFFF;
+  --card-border: #D2E8E5;
+  --body-bg: #F4F7F2;
+  --text-primary: #0F172A;
+  --text-body: #1E293B;
+  --text-secondary: #475569;
+  --btn-bg: #FF9F1C;
+  --btn-shadow: #D97706;
+  --cover-bg: linear-gradient(135deg, #CBF3F0, #FFD166);
+  --code-bg: #1E293B;
+  --dot-color: rgba(46, 196, 182, 0.15);
+  --tape-color: rgba(255, 159, 28, 0.55);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
