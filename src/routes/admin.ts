@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { Env, Post } from '../types';
-import { createToken, verifyToken } from '../auth';
+import { createToken, verifyToken, secureCompare } from '../auth';
 import { 
   listPosts, getPost, createPost, updatePost, deletePost, 
   listCategories, listTags, listLinks, getSettings, updateSetting, getStats 
@@ -24,7 +24,10 @@ adminRouter.post('/login', async (c) => {
     return c.json({ success: false, error: 'Admin secrets are not configured' }, 503);
   }
 
-  if (username === expectedUser && password === expectedPass) {
+  const userMatches = await secureCompare(username, expectedUser);
+  const passMatches = await secureCompare(password, expectedPass);
+
+  if (userMatches && passMatches) {
     // 7 天有效期
     const exp = Math.floor(Date.now() / 1000) + (7 * 24 * 3600);
     const token = await createToken({ username, exp }, secret);

@@ -14,4 +14,20 @@ describe('renderMarkdown normalization', () => {
     expect(result.html).not.toContain('<h1');
     expect(result.html).toContain('<p>正文</p>');
   });
+
+  it('sanitizes dangerous script, iframe, and inline on* event attributes', () => {
+    const malicious = `
+# 标题
+<script>alert("xss")</script>
+<iframe src="https://evil.com"></iframe>
+<img src="x" onerror="alert(1)">
+<a href="javascript:stealToken()">恶意超链接</a>
+    `;
+    const result = renderMarkdown(malicious);
+    expect(result.html).not.toContain('<script');
+    expect(result.html).not.toContain('<iframe');
+    expect(result.html).not.toContain('onerror=');
+    expect(result.html).not.toContain('href="javascript:stealToken()"');
+    expect(result.html).toContain('href="#"');
+  });
 });

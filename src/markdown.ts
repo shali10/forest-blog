@@ -105,13 +105,15 @@ export function renderMarkdown(markdownText: string): MarkdownRenderResult {
     return `<blockquote class="forest-quote">${body}</blockquote>`;
   };
 
-  // 自定义链接（安全外链属性）
+  // 自定义链接（安全外链属性与协议拦截）
   renderer.link = function ({ href, title, tokens }) {
     const text = this.parser.parseInline(tokens);
-    const isExternal = href.startsWith('http://') || href.startsWith('https://');
+    const isDangerous = /^\s*(?:javascript|vbscript):/i.test(href);
+    const safeHref = isDangerous ? '#' : href;
+    const isExternal = safeHref.startsWith('http://') || safeHref.startsWith('https://');
     const targetAttr = isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
     const titleAttr = title ? ` title="${escapeHtml(title)}"` : '';
-    return `<a href="${escapeHtml(href)}"${titleAttr}${targetAttr}>${text}</a>`;
+    return `<a href="${escapeHtml(safeHref)}"${titleAttr}${targetAttr}>${text}</a>`;
   };
 
   marked.setOptions({
@@ -121,13 +123,43 @@ export function renderMarkdown(markdownText: string): MarkdownRenderResult {
   });
 
   const rawHtml = marked.parse(cleanMd) as string;
+  const safeHtml = sanitizeMarkdownHtml(rawHtml);
 
   return {
-    html: rawHtml,
+    html: safeHtml,
     toc,
     wordCount,
     readTimeMin
   };
+}
+
+export function sanitizeMarkdownHtml(html: string): string {
+  if (!html) return '';
+  let clean = html;
+  
+  // 1. 移除危险可执行标签及其内容
+  clean = clean.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+  clean = clean.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
+  clean = clean.replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '');
+  clean = clean.replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '');
+  clean = clean.replace(/<embed\b[^>]*>/gi, '');
+  clean = clean.replace(/<form\b[^<]*(?:(?!<\/form>)<[^<]*)*<\/form>/gi, '');
+  clean = clean.replace(/<base\b[^>]*>/gi, '');
+  clean = clean.replace(/<link\b[^>]*>/gi, '');
+
+  // 2. 清理所有标签内的 inline on* 事件属性，只保留系统安全的 copyCode(this)
+  clean = clean.replace(/\s+on([a-zA-Z]+)\s*=\s*(?:'([^']*)'|"([^"]*)"|([^\s>]+))/gi, (match, evt, val1, val2, val3) => {
+    const val = (val1 || val2 || val3 || '').trim();
+    if (evt.toLowerCase() === 'click' && val === 'copyCode(this)') {
+      return match;
+    }
+    return '';
+  });
+
+  // 3. 清理 a 标签与 img 标签中的 javascript: 和 vbscript: 伪协议
+  clean = clean.replace(/(\s+(?:href|src)\s*=\s*['"])\s*(?:javascript|vbscript):[^'"]*(['"])/gi, '$1#$2');
+
+  return clean;
 }
 
 function escapeHtml(str: string): string {

@@ -172,6 +172,7 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
       </div>
     </div>
   </footer>
+  ${(props.settings as any).custom_footer || ''}
 
   <!-- 多主题配色切换弹窗 -->
   <div id="theme-modal" class="theme-modal" onclick="if(event.target===this)closeThemeModal()">
@@ -252,9 +253,14 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
   <img id="lightbox-img" alt="放大预览">
   </div>
 
-  <!-- 轻量 Prism.js 语法着色 -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" data-manual></script>
+  <!-- 轻量 Prism.js 语法着色 (One Dark 适配) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script>
+    if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+      Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/';
+    }
+  </script>
 
   <script>
     // 精选名言名句库

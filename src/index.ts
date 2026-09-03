@@ -90,9 +90,25 @@ app.get('/', async (c) => {
   return c.html(html);
 });
 
+// 识别自动化爬虫与预加载请求，避免无效刷爆 D1 写入配额
+export function shouldCountView(headerGetter: (name: string) => string | undefined): boolean {
+  const ua = (headerGetter('user-agent') || '').toLowerCase();
+  if (!ua) return false;
+  if (/bot|spider|crawl|slurp|curl|wget|python|urllib|ahrefs|semrush|bytespider|headless/i.test(ua)) {
+    return false;
+  }
+  const purpose = (headerGetter('purpose') || headerGetter('sec-purpose') || '').toLowerCase();
+  if (purpose.includes('prefetch') || purpose.includes('prerender')) {
+    return false;
+  }
+  return true;
+}
+
 // 文章详情页 (支持 /p/:slug 与兼容历史 /post/:slug 路由)
 const handlePostDetail = async (c: any) => {
   const slug = c.req.param('slug');
+  const shouldInc = shouldCountView((k) => c.req.header(k));
+
   const [settings, categories, tags, links, stats] = await Promise.all([
     getSettings(c.env),
     listCategories(c.env),
@@ -101,7 +117,7 @@ const handlePostDetail = async (c: any) => {
     getStats(c.env)
   ]);
 
-  const post = await getPost(c.env, slug, { incViews: true });
+  const post = await getPost(c.env, slug, { incViews: shouldInc });
 
   if (!post) {
     return c.html(render404View(settings), 404);
