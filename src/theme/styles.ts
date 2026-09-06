@@ -198,6 +198,153 @@ export const forestThemeCss = `
   --tape-color: rgba(255, 159, 28, 0.55);
 }
 
+/* 12. 新野兽派 (Neo-Brutalism - 警示黄黑硬描边、无模糊实体硬阴影、胶囊标签与开发者战斗卡风) */
+[data-theme="brutal"] {
+  --header-bg: #FFDE59;
+  --card-bg: #FFFFFF;
+  --card-border: #111111;
+  --body-bg: #FBF9F4;
+  --text-primary: #111111;
+  --text-body: #1E1E1E;
+  --text-secondary: #555555;
+  --btn-bg: #FFDE59;
+  --btn-shadow: #111111;
+  --cover-bg: linear-gradient(135deg, #FFF4BD, #FFE770);
+  --code-bg: #12161F;
+  --dot-color: rgba(17, 17, 17, 0.08);
+  --tape-color: rgba(255, 222, 89, 0.85);
+}
+
+/* 新野兽派专有硬朗工业质感增强 */
+[data-theme="brutal"] header {
+  color: #111111;
+  border-bottom: 3px solid #111111;
+  box-shadow: 0 5px 0px #111111;
+}
+[data-theme="brutal"] header::after {
+  display: none;
+}
+[data-theme="brutal"] .site-brand-pill,
+[data-theme="brutal"] .header-season-capsule {
+  background: #FFFFFF !important;
+  border: 2px solid #111111 !important;
+  color: #111111 !important;
+  box-shadow: 2px 2px 0px #111111 !important;
+}
+[data-theme="brutal"] .theme-btn,
+[data-theme="brutal"] .search-trigger-btn {
+  background: #FFFFFF !important;
+  border: 2px solid #111111 !important;
+  color: #111111 !important;
+  box-shadow: 2.5px 2.5px 0px #111111 !important;
+}
+[data-theme="brutal"] .theme-btn:hover,
+[data-theme="brutal"] .search-trigger-btn:hover {
+  background: #00E5FF !important;
+  border-color: #111111 !important;
+  color: #111111 !important;
+  transform: translate(-1px, -1px) !important;
+  box-shadow: 3.5px 3.5px 0px #111111 !important;
+}
+[data-theme="brutal"] .quote-hero-box {
+  background: #FFFFFF !important;
+  border: 2.5px solid #111111 !important;
+  color: #111111 !important;
+  box-shadow: 4px 4px 0px #111111 !important;
+  border-radius: 12px !important;
+}
+[data-theme="brutal"] .quote-hero-box:hover {
+  background: #FFFFFF !important;
+  transform: translate(-2px, -2px) !important;
+  box-shadow: 6px 6px 0px #111111 !important;
+  border-color: #111111 !important;
+}
+[data-theme="brutal"] .quote-text {
+  color: #111111 !important;
+  text-shadow: none !important;
+}
+[data-theme="brutal"] .quote-author {
+  color: #444444 !important;
+}
+[data-theme="brutal"] .quote-mark {
+  color: #111111 !important;
+  opacity: 0.12 !important;
+}
+[data-theme="brutal"] .post-card {
+  border: 2.5px solid #111111 !important;
+  border-radius: 12px !important;
+  box-shadow: 4px 4px 0px #111111 !important;
+}
+[data-theme="brutal"] .post-card:hover {
+  border-color: #111111 !important;
+  transform: translate(-2px, -2px) !important;
+  box-shadow: 6px 6px 0px #111111 !important;
+}
+[data-theme="brutal"] .profile-card,
+[data-theme="brutal"] .sticky-note-card,
+[data-theme="brutal"] .toc-card,
+[data-theme="brutal"] .article-container {
+  border: 2.5px solid #111111 !important;
+  border-radius: 12px !important;
+  box-shadow: 4px 4px 0px #111111 !important;
+}
+[data-theme="brutal"] .theme-modal-card {
+  border: 3px solid #111111 !important;
+  border-radius: 14px !important;
+  box-shadow: 6px 6px 0px #111111 !important;
+}
+[data-theme="brutal"] .theme-option-btn {
+  border: 2px solid #111111 !important;
+  border-radius: 8px !important;
+  box-shadow: 2px 2px 0px #111111 !important;
+}
+[data-theme="brutal"] .theme-option-btn:hover,
+[data-theme="brutal"] .theme-option-btn.active {
+  border-color: #111111 !important;
+  background: #FFDE59 !important;
+  transform: translate(-1px, -1px) !important;
+  box-shadow: 3px 3px 0px #111111 !important;
+}
+[data-theme="brutal"] .post-tag {
+  border: 1.5px solid #111111 !important;
+  box-shadow: 2px 2px 0px #111111 !important;
+  border-radius: 9999px !important;
+  font-weight: 700 !important;
+  background: #FFFDEC !important;
+  color: #111111 !important;
+}
+[data-theme="brutal"] .pinned-badge {
+  background: #FF4B6E !important;
+  border: 1.5px solid #111111 !important;
+  box-shadow: 2px 2px 0px #111111 !important;
+  border-radius: 6px !important;
+  color: #FFFFFF !important;
+}
+[data-theme="brutal"] .post-content pre,
+[data-theme="brutal"] .article-body pre {
+  border: 2px solid #111111 !important;
+  border-radius: 8px !important;
+  box-shadow: 4px 4px 0px #111111 !important;
+}
+[data-theme="brutal"] blockquote {
+  border: 2px solid #111111 !important;
+  border-left: 6px solid #FFDE59 !important;
+  background: #FFFDEC !important;
+  border-radius: 6px !important;
+  box-shadow: 3px 3px 0px #111111 !important;
+  color: #111111 !important;
+}
+[data-theme="brutal"] .forest-table th {
+  background: #FFDE59 !important;
+  color: #111111 !important;
+  border-bottom: 2px solid #111111 !important;
+  font-weight: 800 !important;
+}
+[data-theme="brutal"] .table-container {
+  border: 2px solid #111111 !important;
+  box-shadow: 3px 3px 0px #111111 !important;
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
   font-family: var(--font-main);

@@ -228,6 +228,10 @@ export function renderBaseLayout(props: BaseLayoutProps): string {
           <span class="theme-dot" style="background:#2EC4B6;border-color:#FF9F1C;"></span>
           <span>🍜 闲暇时光</span>
         </button>
+        <button class="theme-option-btn" data-theme-id="brutal" onclick="selectTheme('brutal')">
+          <span class="theme-dot" style="background:#FFDE59;border:2px solid #111111;"></span>
+          <span>⚡ 新野兽派</span>
+        </button>
       </div>
     </div>
   </div>
